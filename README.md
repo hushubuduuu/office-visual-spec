@@ -112,7 +112,9 @@ python scripts/render-html.py mobile-long templates/mobile-long.html out/
 ## 致谢与参考
 
 **开源依赖**
-- GrapesJS、Vue 3、Tauri 2、html2canvas、html-to-image、jsPDF 等
+- Python：Pillow、PyMuPDF、python-pptx
+- Node.js 18+（仅 `validate-html.mjs`，使用内置模块，无 npm 依赖）
+- Chrome / Edge / Chromium（headless 渲染）
 
 **视觉 / 工作流参考**
 - 小红书知识卡片
