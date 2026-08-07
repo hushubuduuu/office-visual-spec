@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>长文 · 暖纸红印</title>
+<style>
+  :root {
+    --paper: #FDFDFB;
+    --ink: #181614;
+    --body: #2E2A27;
+    --muted: #7E7872;
+    --red: #D31212;
+    --divider: #EBE6DF;
+    --card: #FFFBF9;
+    --sans: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: A4; margin: 18mm; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 2.0; letter-spacing: 0; -webkit-font-smoothing: antialiased; }
+  .longpage { width: 1080px; margin: 0 auto; padding: 160px 72px 180px; }
+  .cover { position: relative; display: flex; align-items: flex-start; gap: 40px; margin-bottom: 110px; }
+  .cover-main { flex: 1; min-width: 0; }
+  .brand { font-weight: 700; font-size: 36px; color: var(--muted); letter-spacing: .08em; }
+  .brand::before { content: ""; display: inline-block; width: 14px; height: 14px; background: var(--red); margin-right: 14px; }
+  .title { font-weight: 800; font-size: 200px; line-height: 1.12; letter-spacing: -.02em; margin: 36px 0 12px; }
+  .title .red { color: var(--red); }
+  .subtitle { font-weight: 600; font-size: 76px; color: var(--body); line-height: 1.5; }
+  .meta { font-weight: 600; font-size: 40px; color: var(--muted); margin-top: 34px; }
+  .meta span { margin: 0 12px; }
+  .essay { width: 100%; }
+  .essay p { font-weight: 400; font-size: 42px; line-height: 2.05; color: var(--body); text-align: justify; text-indent: 2em; margin: 0 0 54px; overflow-wrap: break-word; word-break: break-word; white-space: normal; letter-spacing: 0; }
+  .essay .lead { font-size: 31px; color: var(--ink); font-weight: 500; }
+  .cite-card { position: relative; background: var(--card); border: 1px solid var(--divider); border-left: 8px solid var(--red); border-radius: 0 8px 8px 0; padding: 42px 50px; margin: 64px 0 70px; box-shadow: 0 4px 12px rgba(34,30,26,.03); overflow: hidden; break-inside: avoid; }
+  .cite-card::before { content: "\201C"; position: absolute; top: -34px; right: 24px; font: 700 170px Georgia, serif; color: var(--divider); opacity: .55; pointer-events: none; }
+  .cite-text { font-weight: 500; font-size: 31px; line-height: 2.0; color: var(--ink); letter-spacing: 0; text-align: justify; }
+  .cite-source { margin-top: 24px; font-size: 22px; color: var(--muted); font-weight: 600; }
+  .rest { margin: 108px 0; display: flex; align-items: center; justify-content: center; gap: 22px; }
+  .rest::before, .rest::after { content: ""; height: 1px; width: 220px; background: var(--divider); }
+  .rest span { width: 12px; height: 12px; background: var(--red); transform: rotate(45deg); }
+  .endmark { margin-top: 120px; display: flex; align-items: center; justify-content: center; gap: 18px; color: var(--muted); font-size: 22px; }
+  .endmark::before, .endmark::after { content: ""; height: 1px; width: 160px; background: var(--divider); }
+  .footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; color: var(--muted); font-size: 20px; }
+
+h1, h2, h3, .title, .subtitle, .body, p, li, .intro, .v, .meta-pill, .doctype {
+  text-wrap: pretty;
+}
+.title, h1, h2, h3 {
+  text-wrap: balance;
+}
+</style>
+</head>
+<body>
+<main class="longpage">
+  <div class="cover">
+    <div class="cover-main">
+      <div class="brand">长文 · 总结</div>
+      <h1 class="title">长文标题<br><span class="red">可换行副题</span></h1>
+      <div class="subtitle">连续长文 · 无分段层级</div>
+      <div class="meta"><span>作者</span>作者名<span>｜</span><span>主题</span>主题词</div>
+    </div>
+    
+  </div>
+  <div class="essay">
+    <!-- 替换为连续长文；段落用 <p>，首行会自动缩进 -->
+    <p class="lead">这里是长文的第一段，用于交代全文的问题意识。正文会保持连续阅读，不出现章节标题。</p>
+    <p>这里是普通正文段落。正文使用黑体字体栈，字距为零，两端对齐，行距宽松。长文模式不强制分段，也不使用课程纪要的卡片组件。</p>
+    <div class="cite-card">
+      <p class="cite-text">这里是文献引文，可以引用书籍、论文或笔记原文。</p>
+      <div class="cite-source">作者 · 《文献名》</div>
+    </div>
+    <p>引用卡片只用于承载文献原文，不承担分段标题的功能。引文前后保持连续正文，读者可以自然停顿。</p>
+    <div class="rest"><span></span></div>
+    <p>休息分隔用于主题转折，让读者有呼吸空间，但不构成新的章节。</p>
+  </div>
+  <div class="endmark"><span>完</span></div>
+  <div class="footer">
+    <span>长文 · 总结</span>
+    <span>暖纸红印 · 长文模式</span>
+  </div>
+</main>
+</body>
+</html>

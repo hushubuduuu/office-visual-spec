@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>课程纪要 · 暖纸红印</title>
+<style>
+.sheet { page-break-after: always; break-after: page; }
+.sheet:last-child { page-break-after: auto; break-after: auto; }
+:root {
+    --paper: #FDFDFB;
+    --ink: #181614;
+    --body: #2E2A27;
+    --narrative: #3C3632;
+    --muted: #7E7872;
+    --red: #D31212;
+    --deep-red: #A80E0E;
+    --divider: #EBE6DF;
+    --card: #FFFBF9;
+    --on-accent: #FDFDFB;
+    --serif: "Georgia", "STSongti-SC", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
+    --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    --heading-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+
+    --m-side: 6vw;
+    --m-top: 7.8vh;
+    --m-bottom: 6.4vh;
+
+    --space-xs: 2vw;
+    --space-sm: 4.5vw;
+    --space-md: 6.5vw;
+    --space-lg: 9vw;
+    --space-xl: 13vw;
+
+    --display: clamp(34px, 7.5vw, 62px);
+    --seal: clamp(24px, 4.3vw, 34px);
+    --section: clamp(22px, 4.5vw, 36px);
+    --speaker: clamp(20px, 3.8vw, 30px);
+    --quote: clamp(18px, 2.9vw, 23px);
+    --heading: clamp(17px, 2.8vw, 23px);
+    --brand: clamp(16px, 2.5vw, 20px);
+    --value: clamp(15px, 2.4vw, 19px);
+    --body-size: clamp(15px, 2.5vw, 19px);
+    --numeral: clamp(13px, 2.1vw, 17px);
+    --narrative-size: clamp(14px, 2.3vw, 17px);
+    --meta: clamp(13px, 2vw, 16px);
+    --note: clamp(12px, 1.9vw, 15px);
+    --label: clamp(11px, 1.75vw, 14px);
+    --role: clamp(11px, 1.7vw, 13.5px);
+    --tag: clamp(10px, 1.64vw, 13px);
+    --eyebrow: clamp(9px, 1.5vw, 12px);
+    --micro: clamp(8px, 1.4vw, 11px);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.75;
+    letter-spacing: 0.03em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .sheet {
+    position: relative;
+    width: 794px;
+    height: 1123px;
+    margin: 0 auto;
+    padding: var(--m-top) var(--m-side) var(--m-bottom);
+    overflow: hidden;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1.8vw;
+    color: var(--muted);
+    font-size: var(--note);
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    font-family: var(--heading-font);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.75vw;
+    height: 1.75vw;
+    background: var(--red);
+    flex: none;
+    box-shadow: 1px 1px 3px rgba(198, 13, 13, 0.2);
+  }
+
+  /* Make cover icon bigger and more eye-catching */
+
+
+  .cover-title {
+    font-size: var(--display);
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    font-family: var(--heading-font);
+    margin-top: 7vw;
+    text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.05);
+  }
+
+  .cover-title .accent {
+    color: var(--red);
+    position: relative;
+    display: inline-block;
+  }
+
+  .cover-title .accent::after {
+    content: "";
+    position: absolute;
+    bottom: -0.4vw;
+    left: 0;
+    right: 0;
+    height: 0.4vw;
+    background: var(--red);
+    box-shadow: 0 1px 2px rgba(198, 13, 13, 0.3);
+  }
+
+  .ribbon {
+    letter-spacing: 0.15em;
+    margin-top: 5vw;
+    background: var(--red);
+    color: var(--on-accent);
+    padding: 1.8vw 2.5vw;
+    font-size: var(--brand);
+    font-weight: 700;
+    width: fit-content;
+    min-width: 32vw;
+    box-shadow: 0 4px 8px rgba(198, 13, 13, 0.25);
+    font-family: var(--heading-font);
+  }
+
+  /* Increase metadata font color weight for higher contrast and readability */
+  .meta {
+    letter-spacing: 0.02em;
+    margin-top: 5vw;
+    font-size: var(--meta);
+    line-height: 1.9;
+    color: var(--body);
+    font-family: var(--heading-font);
+  }
+
+  .meta b {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .meta span {
+    color: var(--muted);
+    opacity: 0.6;
+    margin: 0 0.8vw;
+  }
+
+  .rule {
+    height: 0.15vw;
+    background: var(--divider);
+    margin: 5vw 0;
+    border: 0;
+    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .quote-card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--divider);
+    border-left: 0.8vw solid var(--red);
+    padding: 5.5vw 6vw;
+    margin-top: 3vw;
+    box-shadow: 0 2px 5px rgba(34, 30, 26, 0.05), 0 14px 30px rgba(34, 30, 26, 0.08);
+    border-radius: 0 4px 4px 0;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+
+  .quote-card::before {
+    content: "“";
+    position: absolute;
+    top: -2vw;
+    right: 2vw;
+    font-size: 16vw;
+    color: var(--divider);
+    font-family: Georgia, serif;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .quote-card .tag {
+    color: var(--red);
+    font-size: var(--tag);
+    margin-bottom: 1.8vw;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-family: var(--heading-font);
+  }
+
+  .quote-card p {
+    font-size: var(--quote);
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .quote-card em {
+    color: var(--red);
+    font-style: normal;
+    background: rgba(198, 13, 13, 0.05);
+    padding: 0 0.5vw;
+    border-radius: 2px;
+  }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: 5vw 1fr auto;
+    align-items: center;
+    gap: 2vw;
+  }
+
+  .section-num {
+    width: 5vw;
+    height: 5vw;
+    background: var(--ink);
+    color: var(--on-accent);
+    display: grid;
+    place-items: center;
+    font-size: var(--numeral);
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(34, 30, 26, 0.2);
+    font-family: var(--heading-font);
+  }
+
+  .section-title {
+    font-size: var(--section);
+    letter-spacing: -0.01em;
+    font-weight: 800;
+    font-family: var(--heading-font);
+    line-height: 1.25;
+  }
+
+  .section-en {
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: var(--eyebrow);
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .section-rule {
+    height: 0.25vw;
+    background: var(--ink);
+    margin: 4vw 0 6vw;
+    border: 0;
+  }
+
+  .info-list {
+    list-style: none;
+    background: #FFFFFF;
+    border: 1px solid var(--divider);
+    padding: 1vw 4vw;
+    box-shadow: 0 3px 8px rgba(34, 30, 26, 0.02);
+    border-radius: 4px;
+  }
+
+  .info-list li {
+    letter-spacing: 0.015em;
+    display: grid;
+    grid-template-columns: 18vw 1fr;
+    gap: 3vw;
+    padding: 3vw 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: var(--value);
+    align-items: baseline;
+  }
+
+  .info-list li:last-child {
+    border-bottom: 0;
+  }
+
+  .info-list .label {
+    color: var(--muted);
+    font-size: var(--label);
+    font-weight: 700;
+    font-family: var(--heading-font);
+  }
+
+  .info-list .sub {
+    display: block;
+    margin-top: 0.6vw;
+    color: var(--muted);
+    font-size: var(--note);
+    font-weight: normal;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 9vw;
+    margin-top: 2.5vw;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 2.1vw;
+    top: 2vw;
+    bottom: 2vw;
+    width: 0.2vw;
+    background: var(--divider);
+  }
+
+  .step {
+    position: relative;
+    padding-bottom: 7.5vw;
+  }
+
+  .step:last-child {
+    padding-bottom: 0;
+  }
+
+  .step-num {
+    position: absolute;
+    left: -9vw;
+    top: 0;
+    width: 4.4vw;
+    height: 4.4vw;
+    border: 0.25vw solid var(--red);
+    background: #FFFFFF;
+    color: var(--red);
+    display: grid;
+    place-items: center;
+    font-size: var(--note);
+    font-weight: 700;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(198, 13, 13, 0.15);
+    font-family: var(--heading-font);
+  }
+
+  .step h3 {
+    font-size: var(--heading);
+    margin-bottom: 2vw;
+    line-height: 1.35;
+    font-family: var(--heading-font);
+    font-weight: 700;
+  }
+
+  .step p {
+    letter-spacing: 0.015em;
+    color: var(--narrative);
+    font-size: var(--narrative-size);
+    line-height: 1.75;
+  }
+
+  .step p strong {
+    color: var(--deep-red);
+    font-weight: 700;
+  }
+
+  .speaker-head {
+    display: flex;
+    align-items: center;
+    gap: 2.5vw;
+    margin: 2vw 0 5vw;
+  }
+
+  .speaker-role {
+    color: var(--red);
+    font-size: var(--role);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-family: var(--heading-font);
+  }
+
+  .speaker-name {
+    font-size: var(--speaker);
+    font-weight: 800;
+    font-family: var(--heading-font);
+    border-bottom: 3px double var(--red);
+    padding: 0.5vw 1vw;
+    color: var(--ink);
+  }
+
+  .quote-list {
+    list-style: none;
+    display: grid;
+    gap: 4.5vw;
+    margin-top: 2vw;
+  }
+
+  .quote-list .group-gap {
+    margin-top: 3vw;
+  }
+
+  .quote-list li {
+    display: grid;
+    grid-template-columns: 1.5vw 1fr;
+    gap: 3vw;
+    background: #FFFFFF;
+    border: 1px solid var(--divider);
+    border-left: 0.6vw solid var(--red);
+    padding: 3.5vw 4vw;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(34, 30, 26, 0.02);
+    align-items: baseline;
+  }
+
+  .quote-list li::before {
+    content: "“";
+    font-family: Georgia, serif;
+    color: var(--red);
+    font-size: 5vw;
+    line-height: 1;
+    margin-top: -1vw;
+  }
+
+  .quote-list p {
+    font-size: var(--body-size);
+    line-height: 1.75;
+    letter-spacing: 0.015em;
+    color: var(--body);
+  }
+
+  .quote-list b {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .action-list {
+    list-style: none;
+    background: #FFFFFF;
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    padding: 1vw 4vw;
+    box-shadow: 0 3px 8px rgba(34, 30, 26, 0.02);
+  }
+
+  .action-list li {
+    letter-spacing: 0.015em;
+    display: grid;
+    grid-template-columns: 3vw 1fr;
+    align-items: center;
+    gap: 3.5vw;
+    padding: 3.5vw 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: var(--body-size);
+    line-height: 1.65;
+  }
+
+  .action-list li:last-child {
+    border-bottom: 0;
+  }
+
+  .action-check {
+    position: relative;
+    width: 3vw;
+    height: 3vw;
+    border: 0.25vw solid var(--red);
+    border-radius: 2px;
+    background: #FFFFFF;
+  }
+
+  .action-check::after {
+    content: "";
+    position: absolute;
+    left: 0.7vw;
+    top: 0.2vw;
+    width: 0.8vw;
+    height: 1.4vw;
+    border: solid var(--red);
+    border-width: 0 0.3vw 0.3vw 0;
+    transform: rotate(45deg);
+  }
+
+  .action-dot {
+    display: none;
+  }
+
+  .action-list b {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .note-box {
+    border: 1px solid var(--divider);
+    border-left: 0.6vw solid var(--red);
+    background: #FFFFFF;
+    padding: 4vw 4.5vw;
+    margin-top: 4vw;
+    color: var(--muted);
+    font-size: var(--note);
+    line-height: 1.8;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 2px 6px rgba(34, 30, 26, 0.01);
+  }
+
+  .note-box b {
+    color: var(--deep-red);
+    font-weight: 700;
+  }
+
+  .seal-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 12vw 0 7vw;
+  }
+
+  .seal {
+    width: 13vw;
+    height: 13vw;
+    border-radius: 50%;
+    background: var(--red);
+    color: var(--on-accent);
+    display: grid;
+    place-items: center;
+    font-size: var(--seal);
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(198, 13, 13, 0.3);
+    border: 2px double rgba(255, 255, 255, 0.3);
+    font-family: var(--heading-font);
+  }
+
+  .brand {
+    text-align: center;
+    font-size: var(--brand);
+    font-weight: 800;
+    font-family: var(--heading-font);
+    margin-top: 4vw;
+    margin-bottom: 1.5vw;
+  }
+
+  .brand-sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: var(--tag);
+    font-family: var(--heading-font);
+    margin-bottom: 3vw;
+  }
+
+  .footer {
+    margin-top: 6vw;
+    padding-top: 2vw;
+    border-top: 1px solid var(--divider);
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: var(--micro);
+    font-family: var(--heading-font);
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    html, body {
+      background: var(--paper);
+    }
+    .sheet {
+      min-height: auto;
+      overflow: visible;
+      page-break-after: always; break-after: page;
+    }
+    .sheet:last-child {
+      page-break-after: auto; break-after: auto;
+    }
+    .footer {
+      margin-top: 5vw;
+    }
+  }
+
+  @media print {
+    html.print-slide .sheet {
+      min-height: 100vh;
+    }
+    html.print-slide .cover-title {
+      font-size: clamp(24px, 5.2vw, 36px);
+      letter-spacing: -0.025em;
+      font-weight: 800;
+      margin-top: 3vw;
+    }
+    html.print-slide .ribbon {
+      letter-spacing: 0.15em;
+      margin-top: 2vw;
+      padding: 1vw 2vw;
+    }
+    html.print-slide .meta {
+      letter-spacing: 0.03em;
+      margin-top: 2vw;
+      line-height: 1.7;
+    }
+    html.print-slide .rule {
+      margin: 2vw 0;
+    }
+    html.print-slide .quote-card {
+      padding: 2.5vw;
+      margin-top: 1vw;
+    }
+    html.print-slide .section-rule {
+      margin: 2vw 0 3vw;
+    }
+    html.print-slide .info-list li {
+      letter-spacing: 0.02em;
+      padding: 1.3vw 0 1.5vw;
+    }
+    html.print-slide .timeline {
+      margin-top: 1vw;
+    }
+    html.print-slide .step {
+      padding-bottom: 2.2vw;
+    }
+    html.print-slide .step h3 {
+      margin-bottom: 0.8vw;
+    }
+    html.print-slide .speaker-head {
+      margin: 1vw 0 2vw;
+    }
+    html.print-slide .quote-list {
+      gap: 2vw;
+      margin-top: 1vw;
+    }
+    html.print-slide .quote-list li {
+      padding: 1.5vw 2vw;
+    }
+    html.print-slide .quote-list .group-gap {
+      margin-top: 1vw;
+    }
+    html.print-slide .action-list li {
+      letter-spacing: 0.02em;
+      padding: 1.5vw 0 1.7vw;
+    }
+    html.print-slide .note-box {
+      padding: 2vw;
+    }
+    html.print-slide .seal-wrap {
+      margin: 3vw 0 2vw;
+    }
+    html.print-slide .footer {
+      margin-top: 2.5vw;
+      padding-top: 1vw;
+    }
+  }
+
+  /* Redesigned mobile responsive scrolling layout for elegant reading */
+  @media screen and (max-width: 480px) {
+    :root {
+      --m-side: 5vw;
+      --m-top: 9vw;
+      --m-bottom: 7vw;
+    }
+    .sheet {
+      min-height: auto;
+      padding: var(--m-top) var(--m-side) var(--m-bottom);
+      border-bottom: 1px dashed var(--divider);
+    }
+    .sheet::before {
+      display: none;
+    }
+      .info-list li {
+      grid-template-columns: 1fr;
+      gap: 1vw;
+    }
+    .info-list .sub {
+      grid-column: 1;
+    }
+    .quote-list li {
+      padding: 4vw 5vw;
+    }
+  }
+
+  /* Mobile vertical print style for saving vertical long page PDF */
+  html.print-mobile {
+    background: var(--paper);
+  }
+  html.print-mobile .sheet {
+    min-height: 100vh;
+    width: 375px;
+    padding: 35px 25px 25px;
+    border-bottom: 1px dashed var(--divider);
+    box-sizing: border-box;
+    page-break-after: always; break-after: page;
+  }
+  html.print-mobile .sheet::before {
+    display: none;
+  }
+  html.print-mobile .cover-title {
+    font-size: 26px;
+    line-height: 1.25;
+    margin-top: 20px;
+  }
+  html.print-mobile .info-list li {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  html.print-mobile .info-list .sub {
+    grid-column: 1;
+  }
+  html.print-mobile .timeline {
+    padding-left: 24px;
+    margin-top: 15px;
+  }
+  html.print-mobile .step-num {
+    left: -24px;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+  html.print-mobile .quote-list li {
+    padding: 15px 20px;
+  }
+  html.print-mobile .quote-list p {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  html.print-mobile .action-list li {
+    font-size: 12px;
+    padding: 15px 0;
+  }
+
+
+h1, h2, h3, .title, .subtitle, .body, p, li, .intro, .v, .meta-pill, .doctype {
+  text-wrap: pretty;
+}
+.title, h1, h2, h3 {
+  text-wrap: balance;
+}
+</style>
+</head>
+<body>
+  <div class="sheet cover-sheet">
+    <div class="eyebrow">示例纪要 · 暖纸红印模板 · 第一讲</div>
+    
+    <h1 class="cover-title">示例主题的<br><span class="accent">摘要标题</span><br>与副题</h1>
+    <div class="ribbon">课程纪要</div>
+    <div class="meta">
+      <span>日期</span> <b>2026-01-01</b> <span>｜</span> <span>时长</span> <b>约 1 小时</b><br>
+      <span>主讲</span> <b>主讲人甲</b> <span>｜</span> <span>参与</span> <b>参与人乙 · 参与人丙</b>
+    </div>
+    <hr class="rule">
+    <div class="quote-card">
+      <div class="tag">一句话主旨</div>
+      <p>把<em>“核心观点”</em>用一句话讲清楚，这里是<em>示例金句</em>。</p>
+    </div>
+    <div class="footer">
+      <span>暖纸红印模板 · 课程纪要</span>
+      <span>01</span>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="section-header">
+      <div class="section-num">壹</div>
+      <div class="section-title">课程信息</div>
+      <div class="section-en">OVERVIEW</div>
+    </div>
+    <hr class="section-rule">
+    <ul class="info-list">
+      <li><span class="label">课程</span><span>示例课程 · 第一讲</span></li>
+      <li><span class="label">主题</span><span>示例主题的摘要标题与副题</span></li>
+      <li><span class="label">主讲</span><span>主讲人甲<span class="sub">职业示例</span></span></li>
+      <li><span class="label">参与</span><span>参与人乙 · 参与人丙<span class="sub">参与人乙讲模块一 / 参与人丙讲模块二</span></span></li>
+      <li><span class="label">形式</span><span>主讲 + 学员问答 + 工具实操</span></li>
+      <li><span class="label">配套工具</span><span>示例工具<span class="sub">含体验额度</span></span></li>
+    </ul>
+    <div class="footer">
+      <span>暖纸红印模板 · 课程纪要</span>
+      <span>02</span>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="section-header">
+      <div class="section-num">贰</div>
+      <div class="section-title">思路引导（上）</div>
+      <div class="section-en">NARRATIVE FLOW</div>
+    </div>
+    <hr class="section-rule">
+    <div class="timeline">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>从一个示例场景切入</h3>
+        <p>示例场景描述：这里说明第一个要点，用于演示时间线组件的<strong>排版效果</strong>。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>抛出核心观点</h3>
+        <p><strong>“示例概念”</strong>：这里展示一个关键概念；<strong>“另一个概念”</strong>：这里展示与之呼应的说明。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>给出结论</h3>
+        <p>做<strong>“A 类事情”</strong>的将如何；有<strong>“B 类视角”</strong>的人将如何。用于演示时间线的收尾。</p>
+      </div>
+    </div>
+    <div class="footer">
+      <span>暖纸红印模板 · 课程纪要</span>
+      <span>03</span>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="section-header">
+      <div class="section-num">叁</div>
+      <div class="section-title">讲者观点</div>
+      <div class="section-en">VIEWPOINTS</div>
+    </div>
+    <hr class="section-rule">
+    <div class="speaker-head">
+      <span class="speaker-role">主讲 · 示例角色定位</span>
+      <span class="speaker-name">主讲人甲</span>
+    </div>
+    <ul class="quote-list">
+      <li><p><b>观点一</b>：这里是第一条示例观点，用于演示观点卡布局。</p></li>
+      <li><p><b>观点二</b>：这里是第二条示例观点，说明观点卡的排布方式。</p></li>
+      <li class="group-gap"><p><b>观点三</b>：这里是第三条示例观点，演示分组间距效果。</p></li>
+      <li><p><b>观点四</b>：这里是第四条示例观点，展示列表收尾。</p></li>
+    </ul>
+    <div class="footer">
+      <span>暖纸红印模板 · 课程纪要</span>
+      <span>04</span>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="section-header">
+      <div class="section-num">肆</div>
+      <div class="section-title">给学员的行动清单</div>
+      <div class="section-en">ACTION ITEMS</div>
+    </div>
+    <hr class="section-rule">
+    <ul class="action-list">
+      <li><span class="action-check"></span><span class="action-dot"></span><span><b>行动项一</b>：这里写第一条行动建议，用于演示清单组件。</span></li>
+      <li><span class="action-check"></span><span class="action-dot"></span><span>做<strong>“行动项二”</strong>，这里是第二条行动建议的说明文字。</span></li>
+      <li><span class="action-check"></span><span class="action-dot"></span><span><b>行动项三</b>，这里是第三条行动建议，展示清单的排布。</span></li>
+      <li><span class="action-check"></span><span class="action-dot"></span><span><b>行动项四</b>，这里是第四条行动建议，演示清单的收尾。</span></li>
+    </ul>
+    <div class="note-box"><b>说明：</b>本模板按暖纸红印自适应视觉规范生成，正文均为可复制文本，可直接导出任意页面尺寸的 PDF。</div>
+    <div class="footer">
+      <span>暖纸红印模板 · 课程纪要</span>
+      <span>05</span>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="section-header">
+      <div class="section-num">末</div>
+      <div class="section-title">本期回顾</div>
+      <div class="section-en">RECAP</div>
+    </div>
+    <hr class="section-rule">
+    <ul class="action-list">
+      <li><span class="action-check"></span><span class="action-dot"></span><span><b>核心结论</b>：这里是示例的核心结论，一句话讲清重点。</span></li>
+      <li><span class="action-check"></span><span class="action-dot"></span><span><b>方法</b>：这里是示例的方法总结，说明可复用的路径。</span></li>
+      <li><span class="action-check"></span><span class="action-dot"></span><span><b>下一步</b>：这里是示例的行动建议，指引后续动作。</span></li>
+    </ul>
+    <div class="brand">暖纸红印模板 · 示例课程</div>
+    <div class="brand-sub">课程纪要 · 示例内容</div>
+    <div class="note-box"><b>说明：</b>本页为模板示例内容，替换为你自己的正文即可。正文为可复制文本。</div>
+    <div class="footer">
+      <span>暖纸红印模板 · 课程纪要</span>
+      <span>06</span>
+    </div>
+  </div>
+</body>
+</html>

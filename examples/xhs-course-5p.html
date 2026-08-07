@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>课程介绍 · 小红书卡片</title>
+<style>
+:root {
+  --paper: #FDFDFB;
+  --ink: #181614;
+  --body: #2E2A27;
+  --narrative: #3C3632;
+  --muted: #7E7872;
+  --red: #D31212;
+  --deep-red: #A80E0E;
+  --divider: #EBE6DF;
+  --card: #FFFBF9;
+  --on-accent: #FDFDFB;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif;
+  --serif: Georgia, STSongti-SC, Songti SC, Noto Serif CJK SC, Source Han Serif SC, SimSun, serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #EDEAE4;
+  font-family: var(--sans);
+  color: var(--ink);
+}
+.sheet {
+  width: 1080px;
+  height: 1440px;
+  margin: 24px auto;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 150px 72px 150px;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+  box-shadow: 0 30px 70px rgba(24, 22, 20, 0.16);
+}
+.sheet:last-child { page-break-after: auto; break-after: auto; }
+@page { size: 1080px 1440px; margin: 0; }
+.sheet::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid rgba(24, 22, 20, 0.08);
+  pointer-events: none;
+}
+.sheet::after {
+  content: "";
+  position: absolute;
+  top: 42px;
+  right: 42px;
+  width: 18px;
+  height: 18px;
+  background: var(--red);
+  opacity: 0.75;
+  box-shadow: 0 0 0 8px rgba(211, 18, 18, 0.1);
+}
+.ghost {
+  position: absolute;
+  right: 12px;
+  bottom: 36px;
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 420px;
+  line-height: 1;
+  color: rgba(24, 22, 20, 0.05);
+  letter-spacing: -0.05em;
+  user-select: none;
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 30px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.kicker::before { content: ""; width: 52px; height: 3px; background: var(--red); }
+.title {
+  font-size: 190px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 44px 0 30px;
+}
+.title .red { color: var(--red); }
+.subtitle {
+  font-size: 72px;
+  color: var(--body);
+  line-height: 1.5;
+  max-width: 880px;
+}
+.doctype {
+  display: inline-block;
+  margin-top: 44px;
+  padding: 14px 26px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--red);
+  font-size: 26px;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+}
+.tag {
+  display: inline-block;
+  margin-top: 44px;
+  padding: 14px 26px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  background: rgba(255, 251, 249, 0.75);
+  color: var(--muted);
+  font-size: 26px;
+  letter-spacing: 0.16em;
+}
+.body { font-size: 44px; line-height: 2.0; color: var(--body); margin-top: 40px; }
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--divider);
+  border-radius: 18px;
+  padding: 46px 52px;
+  box-shadow: 0 4px 10px rgba(24, 22, 20, 0.08), 0 22px 52px rgba(24, 22, 20, 0.13);
+  break-inside: avoid;
+  overflow: hidden;
+  margin-top: 52px;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: linear-gradient(90deg, var(--red), rgba(211, 18, 18, 0.08));
+}
+.card .quote {
+  position: absolute;
+  top: 12px;
+  right: 30px;
+  font-family: var(--serif);
+  font-size: 130px;
+  color: rgba(211, 18, 18, 0.12);
+  line-height: 1;
+}
+.list { margin-top: 64px; }
+.list .item {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--divider);
+  font-size: 44px;
+  line-height: 1.75;
+}
+.list .dot {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-top: 20px;
+  border: 5px solid var(--red);
+  border-radius: 8px;
+  background: rgba(211, 18, 18, 0.08);
+}
+.end { display: grid; place-items: center; text-align: center; }
+
+h1, h2, h3, .title, .subtitle, .body, p, li, .intro, .v, .meta-pill, .doctype {
+  text-wrap: pretty;
+}
+.title, h1, h2, h3 {
+  text-wrap: balance;
+}
+
+/* 小红书内容页：降低字号、提高密度 */
+.subtitle { font-size: 56px; }
+.kicker { font-size: 24px; gap: 12px; }
+.kicker::before { width: 38px; }
+.doctype { font-size: 22px; padding: 10px 18px; }
+.ghost { font-size: 360px; }
+.body { font-size: 36px; line-height: 1.85; }
+.list { margin-top: 36px; }
+.list .item { font-size: 36px; padding: 24px 0; gap: 24px; line-height: 1.65; }
+.list .dot { width: 24px; height: 24px; margin-top: 16px; border-width: 4px; }
+.meta-row { gap: 16px; margin-top: 36px; }
+.meta-pill { font-size: 22px; padding: 10px 18px; }
+.intro { font-size: 32px; line-height: 1.75; color: var(--body); margin-top: 20px; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px; }
+.info-cell { background: var(--card); border: 1px solid var(--divider); border-radius: 14px; padding: 18px 22px; box-shadow: 0 3px 8px rgba(24,22,20,.06), 0 14px 30px rgba(24,22,20,.08); }
+.info-cell .icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(211,18,18,.08); color: var(--red); display: grid; place-items: center; font-size: 21px; font-weight: 800; margin-bottom: 8px; }
+.info-cell .k { font-size: 18px; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; }
+.info-cell .v { font-size: 26px; font-weight: 700; line-height: 1.35; }
+.profile-grid { gap: 22px; margin-top: 28px; }
+.profile-card { padding: 26px 30px; gap: 22px; }
+.avatar { width: 72px; height: 72px; font-size: 28px; }
+.profile-card h3 { font-size: 38px; }
+.profile-card .role { font-size: 22px; margin: 4px 0 8px; }
+.profile-card p { font-size: 28px; line-height: 1.65; }
+.points-grid { gap: 20px; margin-top: 28px; }
+.point-card { padding: 26px 28px; }
+.point-card .n { font-size: 22px; }
+.point-card h3 { font-size: 34px; margin: 10px 0 8px; }
+.point-card p { font-size: 26px; line-height: 1.65; }
+.ending .list .item { font-size: 34px; padding: 22px 0; }
+
+/* 模块化页眉页脚 */
+.page-head { display: flex; justify-content: space-between; align-items: center; border-top: 4px solid var(--red); padding-top: 18px; margin-bottom: 22px; font-size: 22px; color: var(--muted); }
+.page-head .deck { font-weight: 800; color: var(--ink); }
+.page-head .pg { color: var(--red); font-weight: 800; letter-spacing: .08em; }
+.page-foot { display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--divider); margin-top: 30px; padding-top: 16px; font-size: 20px; color: var(--muted); }
+.page-foot .end { color: var(--red); font-weight: 800; letter-spacing: .12em; }
+
+/* 纯排版封面 */
+.cover-lines { margin-top: 34px; }
+.cover-line1 { width: 100%; height: 5px; background: var(--red); }
+.cover-line2 { width: 100%; height: 2px; background: var(--ink); margin-top: 6px; }
+.label-box { margin-top: 40px; border: 1px solid var(--divider); border-radius: 14px; padding: 22px 28px; font-size: 30px; color: var(--body); box-shadow: 0 2px 6px rgba(24,22,20,.04), 0 12px 26px rgba(24,22,20,.06); }
+.label-box b { color: var(--red); }
+
+/* 结尾红色 END 带 */
+.ending-band { margin-top: 44px; background: var(--red); color: var(--paper); border-radius: 14px; padding: 26px 30px; font-size: 34px; font-weight: 800; letter-spacing: .14em; text-align: center; box-shadow: 0 8px 22px rgba(211,18,18,.18); }
+@media print {
+  body { background: var(--paper); }
+  .sheet { margin: 0; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <span class="ghost">01</span>
+  <div class="kicker">XHS · COURSE</div>
+  <h1 class="title">示例课程名称<br><span class="red">副标题示例</span></h1>
+  <p class="subtitle">一句课程钩子文案，说明这门课解决什么问题。</p>
+  <div class="cover-lines"><div class="cover-line1"></div><div class="cover-line2"></div></div>
+  <div class="label-box"><b>课程介绍</b> · 5 页卡片 · 示例内容</div>
+  <div class="meta-row">
+    <span class="meta-pill">示例时长</span>
+    <span class="meta-pill">附示例工具</span>
+  </div>
+</div>
+
+<div class="sheet">
+  <span class="ghost">02</span>
+  <div class="page-head"><span class="deck">课程介绍</span><span class="pg">02/05</span></div>
+  <div class="kicker">01 · 课程概览</div>
+  <h2 class="title" style="font-size:92px">这门课解决什么问题</h2>
+  <p class="intro">示例课程介绍文案：说明课程解决的问题、适合的人群与交付的价值。</p>
+  <div class="info-grid">
+    <div class="info-cell"><div class="icon">形</div><div class="k">形式</div><div class="v">主讲 + 问答 + 实操</div></div>
+    <div class="info-cell"><div class="icon">时</div><div class="k">时长</div><div class="v">约 1 小时</div></div>
+    <div class="info-cell"><div class="icon">主</div><div class="k">主讲</div><div class="v">主讲人甲 · 示例身份</div></div>
+    <div class="info-cell"><div class="icon">参</div><div class="k">参与</div><div class="v">参与人乙 · 参与人丙</div></div>
+    <div class="info-cell"><div class="icon">具</div><div class="k">配套工具</div><div class="v">示例工具</div></div>
+    <div class="info-cell"><div class="icon">适</div><div class="k">适合谁</div><div class="v">示例人群 A / 人群 B</div></div>
+    <div class="info-cell"><div class="icon">得</div><div class="k">学员收获</div><div class="v">示例收获描述</div></div>
+    <div class="info-cell"><div class="icon">题</div><div class="k">课程主题</div><div class="v">示例课程主题</div></div>
+  </div>
+  <div class="page-foot"><span>课程介绍</span><span class="end">02 / 05</span></div>
+</div>
+
+<div class="sheet">
+  <span class="ghost">03</span>
+  <div class="page-head"><span class="deck">课程介绍</span><span class="pg">03/05</span></div>
+  <div class="kicker">02 · 讲者阵容</div>
+  <h2 class="title" style="font-size:92px">三种角色，一条主线</h2>
+  <div class="profile-grid">
+    <div class="profile-card">
+      <div class="avatar">甲</div>
+      <div><h3>主讲人甲</h3><div class="role">主讲 · 示例角色定位</div><p>示例介绍：负责主线观点、案例拆解与内容主线。</p></div>
+    </div>
+    <div class="profile-card">
+      <div class="avatar">乙</div>
+      <div><h3>参与人乙</h3><div class="role">示例模块一视角</div><p>负责示例模块一的讲解与内容组织。</p></div>
+    </div>
+    <div class="profile-card">
+      <div class="avatar">丙</div>
+      <div><h3>参与人丙</h3><div class="role">示例模块二视角</div><p>负责示例模块二的演示与落地流程。</p></div>
+    </div>
+  </div>
+  <div class="page-foot"><span>课程介绍</span><span class="end">03 / 05</span></div>
+</div>
+
+<div class="sheet">
+  <span class="ghost">04</span>
+  <div class="page-head"><span class="deck">课程介绍</span><span class="pg">04/05</span></div>
+  <div class="kicker">03 · 核心观点</div>
+  <h2 class="title" style="font-size:92px">四个示例要点</h2>
+  <div class="points-grid">
+    <div class="point-card"><span class="n">01</span><h3>示例要点一</h3><p>要点说明：一句话讲清核心观点。</p></div>
+    <div class="point-card"><span class="n">02</span><h3>示例要点二</h3><p>要点说明：支撑核心观点的第二条论据。</p></div>
+    <div class="point-card"><span class="n">03</span><h3>示例要点三</h3><p>要点说明：支撑核心观点的第三条论据。</p></div>
+    <div class="point-card"><span class="n">04</span><h3>示例要点四</h3><p>要点说明：支撑核心观点的第四条论据。</p></div>
+  </div>
+  <div class="page-foot"><span>课程介绍</span><span class="end">04 / 05</span></div>
+</div>
+
+<div class="sheet ending">
+  <span class="ghost">05</span>
+  <div class="kicker">RECAP · ENDING</div>
+  <h2 class="title" style="font-size:110px">现在就可以开始</h2>
+  <div class="list">
+    <div class="item"><span class="dot"></span><span>示例行动项一：一句话说明第一步动作</span></div>
+    <div class="item"><span class="dot"></span><span>示例行动项二：一句话说明第二步动作</span></div>
+    <div class="item"><span class="dot"></span><span>示例行动项三：一句话说明第三步动作</span></div>
+    <div class="item"><span class="dot"></span><span>示例行动项四：一句话说明第四步动作</span></div>
+  </div>
+  <div class="card" style="margin-top:28px">
+    <span class="quote">“</span>
+    <p class="body">示例收束语：一句话总结课程价值。</p>
+  </div>
+  <div class="ending-band">END · 课程介绍</div>
+</div>
+
+</body>
+</html>

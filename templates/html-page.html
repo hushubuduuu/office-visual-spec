@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML 页面 · 暖纸红印</title>
+<style>
+:root {
+  --paper: #FDFDFB;
+  --ink: #181614;
+  --body: #2E2A27;
+  --muted: #7E7872;
+  --red: #D31212;
+  --divider: #EBE6DF;
+  --card: #FFFBF9;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+.page { max-width: 860px; margin: 0 auto; padding: 72px 40px 96px; }
+@page { size: A4; margin: 18mm; }
+.eyebrow { font-size: 14px; letter-spacing: 0.18em; color: var(--muted); }
+.doctype { color: var(--red); font-weight: 700; }
+.title { font-size: 56px; font-weight: 800; line-height: 1.15; margin: 24px 0 18px; }
+.title .red { color: var(--red); }
+.subtitle { font-size: 24px; line-height: 1.7; color: var(--body); margin-bottom: 28px; }
+.meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 16px; color: var(--muted); margin-bottom: 36px; }
+.meta b { color: var(--ink); }
+.sec { font-size: 32px; font-weight: 800; margin: 48px 0 18px; border-left: 6px solid var(--red); padding-left: 16px; }
+.sec .en { display: block; font-size: 14px; color: var(--muted); letter-spacing: 0.14em; margin-top: 6px; }
+p { font-size: 20px; line-height: 1.9; color: var(--body); margin: 18px 0; text-wrap: pretty; }
+.quote {
+  background: var(--card);
+  border: 1px solid var(--divider);
+  border-left: 6px solid var(--red);
+  border-radius: 0 12px 12px 0;
+  padding: 24px 28px;
+  font-size: 22px;
+  line-height: 1.8;
+  box-shadow: 0 3px 8px rgba(24,22,20,.06), 0 14px 30px rgba(24,22,20,.08);
+  break-inside: avoid;
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">HTML 页面 · 学术文章 <span class="doctype">HTML 页面 · 暖纸红印</span></div>
+  <h1 class="title">页面标题写在这里<br><span class="red">红色副题</span></h1>
+  <p class="subtitle">一段引导，说明这篇文章要回答什么问题。</p>
+  <div class="meta"><span><b>作者</b> 作者名</span><span><b>来源</b> 来源名</span><span><b>日期</b> 2026-01-01</span></div>
+  <h2 class="sec">第一节<span class="en">SECTION 01</span></h2>
+  <p>在这里写入正文段落，正文使用真实文字，可复制、可搜索。</p>
+  <div class="quote">“一段值得强调的引文或核心结论。”</div>
+  <h2 class="sec">第二节<span class="en">SECTION 02</span></h2>
+  <p>在这里继续写入正文内容，页面高度随内容自然增长。</p>
+</div>
+</body>
+</html>

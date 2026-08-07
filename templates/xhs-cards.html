@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小红书卡片 · 暖纸红印</title>
+<style>
+:root {
+  --paper: #FDFDFB;
+  --ink: #181614;
+  --body: #2E2A27;
+  --narrative: #3C3632;
+  --muted: #7E7872;
+  --red: #D31212;
+  --deep-red: #A80E0E;
+  --divider: #EBE6DF;
+  --card: #FFFBF9;
+  --on-accent: #FDFDFB;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif;
+  --serif: Georgia, STSongti-SC, Songti SC, Noto Serif CJK SC, Source Han Serif SC, SimSun, serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #EDEAE4;
+  font-family: var(--sans);
+  color: var(--ink);
+}
+.sheet {
+  width: 1080px;
+  height: 1440px;
+  margin: 24px auto;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 110px 56px 130px;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+  box-shadow: 0 30px 70px rgba(24, 22, 20, 0.16);
+}
+.sheet:last-child { page-break-after: auto; break-after: auto; }
+@page { size: 1080px 1440px; margin: 0; }
+.sheet::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid rgba(24, 22, 20, 0.08);
+  pointer-events: none;
+}
+.sheet::after {
+  content: "";
+  position: absolute;
+  top: 42px;
+  right: 42px;
+  width: 18px;
+  height: 18px;
+  background: var(--red);
+  opacity: 0.75;
+  box-shadow: 0 0 0 8px rgba(211, 18, 18, 0.1);
+}
+.ghost {
+  position: absolute;
+  right: 12px;
+  bottom: 24px;
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 300px;
+  line-height: 1;
+  color: rgba(24, 22, 20, 0.05);
+  letter-spacing: -0.05em;
+  user-select: none;
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.kicker::before { content: ""; width: 52px; height: 3px; background: var(--red); }
+.title {
+  font-size: 150px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 30px 0 18px;
+}
+.title .red { color: var(--red); }
+.subtitle {
+  font-size: 52px;
+  color: var(--body);
+  line-height: 1.5;
+  max-width: 880px;
+}
+.doctype {
+  display: inline-block;
+  margin-top: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--red);
+  font-size: 22px;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+}
+.tag {
+  display: inline-block;
+  margin-top: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  background: rgba(255, 251, 249, 0.75);
+  color: var(--muted);
+  font-size: 22px;
+  letter-spacing: 0.16em;
+}
+.body { font-size: 36px; line-height: 1.85; color: var(--body); margin-top: 28px; }
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--divider);
+  border-radius: 18px;
+  padding: 34px 38px;
+  box-shadow: 0 4px 10px rgba(24, 22, 20, 0.08), 0 22px 52px rgba(24, 22, 20, 0.13);
+  break-inside: avoid;
+  overflow: hidden;
+  margin-top: 52px;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: linear-gradient(90deg, var(--red), rgba(211, 18, 18, 0.08));
+}
+.card .quote {
+  position: absolute;
+  top: 12px;
+  right: 30px;
+  font-family: var(--serif);
+  font-size: 130px;
+  color: rgba(211, 18, 18, 0.12);
+  line-height: 1;
+}
+.list { margin-top: 36px; }
+.list .item {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--divider);
+  font-size: 34px;
+  line-height: 1.65;
+}
+.list .dot {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 14px;
+  border: 5px solid var(--red);
+  border-radius: 8px;
+  background: rgba(211, 18, 18, 0.08);
+}
+.end { display: grid; place-items: center; text-align: center; }
+
+@media print {
+  body { background: var(--paper); }
+  .sheet { margin: 0; box-shadow: none; }
+}
+
+h1, h2, h3, .title, .subtitle, .body, p, li, .intro, .v, .meta-pill, .doctype {
+  text-wrap: pretty;
+}
+.title, h1, h2, h3 {
+  text-wrap: balance;
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <span class="ghost">01</span>
+  <div class="kicker">XHS · COVER</div>
+  <h1 class="title">封面标题<br><span class="red">红色副题</span></h1>
+  <p class="subtitle">一段钩子文案，让人想继续看。</p>
+  <span class="doctype">小红书卡片系列</span>
+</div>
+
+<div class="sheet">
+  <span class="ghost">02</span>
+  <div class="kicker">01 · CONTENT</div>
+  <h2 class="title" style="font-size:96px">核心信息</h2>
+  <div class="card">
+    <span class="quote">“</span>
+    <p class="body">一段引导说明，把这一页最想讲的话放在最前面。</p>
+  </div>
+  <div class="list">
+    <div class="item"><span class="dot"></span><span>第一点内容</span></div>
+    <div class="item"><span class="dot"></span><span>第二点内容</span></div>
+    <div class="item"><span class="dot"></span><span>第三点内容</span></div>
+  </div>
+</div>
+
+<div class="sheet end">
+  <span class="ghost">03</span>
+  <div class="kicker">RECAP · ENDING</div>
+  <h2 class="title" style="font-size:120px">一句话总结</h2>
+  <div class="card" style="margin-top:40px">
+    <span class="quote">“</span>
+    <p class="body">核心回顾：第一点 / 第二点 / 第三点。</p>
+  </div>
+  <span class="doctype">小红书卡片系列</span>
+</div>
+
+</body>
+</html>

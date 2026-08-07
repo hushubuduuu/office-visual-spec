@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>不规则分页测试 · 混合标记</title>
+<style>
+/* ═══ 不规则测试目标：
+   1. 混合四种标记语法（老 page-break-* / 新 break-* / always / left）
+   2. @media print 里的规则（屏幕下不生效，靠样式表扫描识别）
+   3. 无标记区域 → 按所选纸张高度等分切
+   4. 块高度不统一，制造"不规则" ═══ */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#EDEAE4;font-family:"DengXian","Microsoft YaHei",sans-serif;}
+
+.blk{
+  background:#FDFDFB;color:#2E2A27;
+  border-bottom:4px dashed #C8C2B8;   /* 视觉分隔，方便肉眼看断点 */
+  padding:60px 64px;position:relative;
+}
+.blk .tag{
+  position:absolute;top:0;left:0;background:#181614;color:#FDFDFB;
+  font-size:15px;letter-spacing:1px;padding:6px 14px;
+  font-family:"Microsoft YaHei",sans-serif;
+}
+.blk h2{font-size:44px;color:#181614;margin-bottom:20px;font-family:"Microsoft YaHei",sans-serif;}
+.blk p{font-size:26px;line-height:1.7;color:#3C3632;}
+.blk p b{color:#D31212;}
+
+/* ① 老语法 page-break-after: always */
+.blk-a{height:760px;}
+.blk-a{page-break-after:always;}
+
+/* ② 新语法 break-after: page */
+.blk-b{height:1320px;}
+.blk-b{break-after:page;}
+
+/* ③ 老语法 page-break-before: always */
+.blk-c{height:980px;}
+.blk-c{page-break-before:always;}
+
+/* ④ 新语法 break-before: page */
+.blk-d{height:640px;}
+.blk-d{break-before:page;}
+
+/* ⑤ left 值（page-break-after: left） */
+.blk-e{height:1500px;}
+.blk-e{page-break-after:left;}
+
+/* ⑥ @media print 里定义的规则：屏幕下不生效，仅 print */
+.blk-f{height:850px;}
+@media print{
+  .blk-f{page-break-after:always;}
+}
+
+/* ⑦ 无任何分页标记 —— 应靠纸张高度等分切 */
+.blk-g{height:2000px;}
+</style>
+</head>
+<body>
+
+<div class="blk blk-a"><span class="tag">① page-break-after:always</span><h2>块 A · 老语法 after</h2><p>高度 760px。<b>page-break-after:always</b> 之后应断页。</p></div>
+
+<div class="blk blk-b"><span class="tag">② break-after:page</span><h2>块 B · 新语法 after</h2><p>高度 1320px。<b>break-after:page</b> 之后应断页。</p></div>
+
+<div class="blk blk-c"><span class="tag">③ page-break-before:always</span><h2>块 C · 老语法 before</h2><p>高度 980px。<b>page-break-before:always</b> 之前应断页（即断点在本块顶部）。</p></div>
+
+<div class="blk blk-d"><span class="tag">④ break-before:page</span><h2>块 D · 新语法 before</h2><p>高度 640px。<b>break-before:page</b> 之前应断页（断点在本块顶部）。</p></div>
+
+<div class="blk blk-e"><span class="tag">⑤ page-break-after:left</span><h2>块 E · left 值</h2><p>高度 1500px。<b>page-break-after:left</b> 之后应断页（left/right 值等同 always）。</p></div>
+
+<div class="blk blk-f"><span class="tag">⑥ @media print 规则</span><h2>块 F · media print</h2><p>高度 850px。规则写在 <b>@media print</b> 里：<code>.blk-f{page-break-after:always}</code>，屏幕下不生效，靠样式表扫描识别。</p></div>
+
+<div class="blk blk-g"><span class="tag">⑦ 无标记 · 等分切</span><h2>块 G · 无分页标记</h2><p>高度 2000px。没有任何分页标记，若选 card34 设备（1080×1440）应被 <b>1440px 等分切</b>成两页。</p></div>
+
+</body>
+</html>
