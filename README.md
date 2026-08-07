@@ -4,6 +4,7 @@
 - 每一种都会保留可编辑的 HTML，并导出 PNG 和 PDF，方便直接使用或继续修改。
 - 色调以米色红色黑色为主，极简风格。
 - 你只需要提供一份笔记、文章或课程内容，它能帮你生成排版整齐的 PDF、PPT、卡片、长图和网页。
+- macOS 用户注意：Safari 不支持 headless 渲染，请安装 Chrome、Chromium 或 Edge；安装后运行 doctor，或用 OVS_BROWSER 指定浏览器路径。
 
 ## 它能做什么
 
@@ -16,8 +17,6 @@
 | 小红书卡片 | 3:4 竖版系列卡片，适合发小红书 |
 | 手机长图 | 1080px 宽长图，适合手机阅读 |
 | 信息图 | 单张知识图，适合快速传播 |
-
-每一种都会保留可编辑的 HTML，并导出 PNG 和 PDF，方便直接使用或继续修改。
 
 ## 适合谁
 
@@ -82,8 +81,6 @@ python scripts/render-html.py mobile-long templates/mobile-long.html out/
 - `Pillow`、`PyMuPDF`、`python-pptx`（见 `requirements.txt`）
 - Node.js 18+（仅自检脚本需要）
 - Chrome / Edge / Chromium
-
-macOS 用户注意：Safari 不支持 headless 渲染，请安装 Chrome、Chromium 或 Edge；安装后运行 doctor，或用 `OVS_BROWSER` 指定浏览器路径。
 
 在中国大陆如果官方 PyPI 慢或失败，`install.bat` / `install.sh` 会自动用清华镜像重试，也可以先设置 `OVS_PIP_INDEX` 指定镜像。
 
