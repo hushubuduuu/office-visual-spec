@@ -92,6 +92,8 @@ Array.from(document.querySelectorAll('.sheet, .canvas')).forEach(s => {
 ```
 
 > 验证入口：以上检查已内置在 `render-html.py`，用 `--check-only` 运行即可。禁止另写 CDP / scrollHeight 探针；手写探针会被动画状态干扰。
+> 幽灵数字注意：大字号 ghost 数字建议用衬线字体，或加 `height:1em; overflow:hidden`，否则无衬线下 `scrollHeight` 虚高会导致 `check_overflow` 误报。
+
 
 ## 交互网页 PPT 截图
 
