@@ -1,40 +1,59 @@
-# office-visual-spec 包
+# 暖纸红印 · office-visual-spec
 
-暖纸红印严格视觉规范 + 工作流 skill 包。支持 Windows / macOS / Linux。
+把文字内容变成好看、可直接使用的视觉成品。你只需要提供一份笔记、文章或课程内容，它能帮你生成排版整齐的 PDF、PPT、卡片、长图和网页。
 
-## 快速开始
+## 它能做什么
 
-第一次使用先安装环境：
+| 成品 | 用途 |
+| --- | --- |
+| A4 PDF 摘要 | 论文、课程、报告整理成一页页阅读版 |
+| 静态 PPT | 16:9 分享图，可导出 PDF / PNG |
+| 交互网页 PPT | 在浏览器里翻页、有动效的演示页 |
+| HTML 页面 | 可滚动阅读的完整文章页 |
+| 小红书卡片 | 3:4 竖版系列卡片，适合发小红书 |
+| 手机长图 | 1080px 宽长图，适合手机阅读 |
+| 信息图 | 单张知识图，适合快速传播 |
 
-- Windows：双击 `install.bat`
-- macOS / Linux：运行 `bash install.sh`
+每一种都会保留可编辑的 HTML，并导出 PNG 和 PDF，方便直接使用或继续修改。
 
-安装完成后检查环境：
+## 适合谁
 
-- Windows：双击 `doctor.bat`
-- macOS / Linux：运行 `bash doctor.sh`
+- 不想学排版，想快速把笔记 / 文章变成图的人
+- 做课程资料、分享卡片、公众号 / 小红书配图的人
+- 用 AI agent 自动生成和批量产出视觉内容的人
 
-AI 或 CI 自动运行时，给 bat 加 `/nopause`，或设置 `OVS_NO_PAUSE=1`；CI 环境会自动跳过 `pause`。
+## 效果长什么样
 
-`doctor` 会逐项检查 Python、依赖、Node、Chrome/Edge，并显示 ✅/❌ 和解决办法。
+`examples/` 文件夹里放了参考样例：A4 摘要 PDF、小红书卡片、手机长图。先看样例，再决定要生成哪一种。
 
-## 工作流
+## 第一次使用
 
-1. 提问确认输出类型、内容处理、结构形态、风格。
-2. 读 `references/README.md` 二级索引，按功能区从 `references/modules.md` 选模块，从 `templates/` 选择模板，生成可编辑 HTML。
-3. 运行 `scripts/validate-html.mjs` 自检。
-4. 用 `scripts/render-html.py` 按 `references/render.md` 标准管线导出 PNG/PDF。
-5. 交付 HTML 路径、尺寸、页数、导出文件。
-6. 用户可微调；风格不满意时走 `references/style-adjustment.md`。
+Windows：
+
+1. 双击 `install.bat`，自动安装环境
+2. 双击 `doctor.bat`，检查环境
+3. 看到“全部通过”就可以开始用
+
+macOS / Linux：
+
+1. 运行 `bash install.sh`
+2. 运行 `bash doctor.sh`
+3. 看到“全部通过”就可以开始用
+
+`doctor` 会逐项检查 Python、依赖、Node、Chrome/Edge，并显示 ✅/❌ 和解决办法。AI 或 CI 自动运行时，给 bat 加 `/nopause`，或设置 `OVS_NO_PAUSE=1`。
+
+## 给 AI / agent 的入口
+
+如果由 AI 助手来使用，请先读 `SKILL.md`。它包含完整工作流、硬规则和 `references/` 的读取顺序；`references/modules.md` 是模块构成规则，`references/render.md` 是渲染与导出契约。
 
 ## 目录
 
 ```text
-SKILL.md                          # 工作流 + AI 执行摘要 + 硬规则 + token
-references/                       # 二级索引 README.md + 类型规范 + 模块库 modules.md
-templates/                        # A4 / 静态 PPT / 交互网页 PPT / 小红书 / 手机长图 / 长文 / HTML 页面 / 信息图模板
+SKILL.md                          # AI 工作流入口
+references/                       # 类型规范、模块库、渲染契约
+templates/                        # 各类型模板
 scripts/                          # 自检、诊断和标准渲染管线
-examples/                         # 参考样本（不规则分页、A4 示例、小红书成品）
+examples/                         # 参考样例
 install.bat / install.sh          # 一键安装
 doctor.bat / doctor.sh            # 环境自检入口
 requirements.txt                  # Python 依赖
@@ -43,6 +62,9 @@ requirements.txt                  # Python 依赖
 ## 使用
 
 ```bash
+# 环境自检
+python scripts/doctor.py
+
 # 自检 HTML
 node scripts/validate-html.mjs templates/ppt-16-9.html
 
@@ -50,8 +72,6 @@ node scripts/validate-html.mjs templates/ppt-16-9.html
 python scripts/render-html.py html-ppt templates/ppt-16-9.html out/
 python scripts/render-html.py mobile-long templates/mobile-long.html out/
 ```
-
-所有类型的画布、PDF 页、PNG 倍率和截图规则见 `references/render.md`，不要临场发明导出参数。
 
 ## 依赖
 
@@ -62,13 +82,13 @@ python scripts/render-html.py mobile-long templates/mobile-long.html out/
 
 macOS 用户注意：Safari 不支持 headless 渲染，请安装 Chrome、Chromium 或 Edge；安装后运行 doctor，或用 `OVS_BROWSER` 指定浏览器路径。
 
-在中国大陆如果官方 PyPI 慢或失败，`install.bat` / `install.sh` 会自动用清华镜像重试，也可以先设置 `OVS_PIP_INDEX` 指定镜像。Node 自检脚本只用内置模块，不需要 npm 安装；浏览器需要单独安装，或设置 `OVS_BROWSER` 指向已有浏览器。
+在中国大陆如果官方 PyPI 慢或失败，`install.bat` / `install.sh` 会自动用清华镜像重试，也可以先设置 `OVS_PIP_INDEX` 指定镜像。
 
 ## 环境变量
 
 | 变量 | 作用 |
 | --- | --- |
-| `OVS_BROWSER` | 指定浏览器路径或命令，例如 `C:\...\chrome.exe` 或 `google-chrome` |
+| `OVS_BROWSER` | 指定浏览器路径或命令 |
 | `OVS_ALLOW_NETWORK` | 设为 `1` 时允许渲染期间联网 |
 | `OVS_NO_SANDBOX` | 设为 `1` 时强制关闭浏览器沙箱（仅容器/CI） |
 | `OVS_DEBUG` | 设为 `1` 时显示完整错误信息 |
@@ -81,10 +101,6 @@ macOS 用户注意：Safari 不支持 headless 渲染，请安装 Chrome、Chrom
 - 默认启用浏览器沙箱。脚本会自动探测沙箱可用性，仅在带沙箱无法启动时降级，并在终端显示 WARN。`OVS_NO_SANDBOX=1` 可强制关闭沙箱。
 - 临时 HTML、截图和浏览器 profile 位于系统临时目录，脚本会在正常和异常路径下尽力清理；极端退出时可能残留 `%TEMP%\ovs-*`。
 - 本包不含遥测、上传、日志回传或远程资源。
-
-## 启用
-
-将本包内容复制到你的 AI 助手 skills 目录（如 `~/.cola/skills/office-visual-spec/`），并同步对应的 skill 入口。
 
 ## 许可
 
