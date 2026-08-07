@@ -1,4 +1,4 @@
-# 暖纸红印 · office-visual-spec
+# DUDU · office-visual-spec
 
 - 基于HTML编写把文字内容变成好看、可直接使用的视觉成品。
 - 每一种都会保留可编辑的 HTML，并导出 PNG 和 PDF，方便直接使用或继续修改。
