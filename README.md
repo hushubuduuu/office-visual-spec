@@ -28,10 +28,10 @@
 
 `examples/` 文件夹里放了参考样例。以下是用本包生成的几种成品：
 
-<img src="examples/preview-a4-summary.png" width="260" alt="A4 摘要">
-<img src="examples/preview-ppt.png" width="260" alt="静态 PPT">
-<img src="examples/preview-xhs-card.png" width="260" alt="小红书卡片">
-<img src="examples/preview-infographic.png" width="260" alt="信息图">
+<img src="examples/preview-v2-a4-summary.png" width="260" alt="A4 摘要">
+<img src="examples/preview-v2-ppt.png" width="260" alt="静态 PPT">
+<img src="examples/preview-v2-xhs-card.png" width="260" alt="小红书卡片">
+<img src="examples/preview-v2-infographic.png" width="260" alt="信息图">
 
 先看样例，再决定要生成哪一种。
 
