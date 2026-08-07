@@ -109,6 +109,18 @@ python scripts/render-html.py mobile-long templates/mobile-long.html out/
 - 临时 HTML、截图和浏览器 profile 位于系统临时目录，脚本会在正常和异常路径下尽力清理；极端退出时可能残留 `%TEMP%\ovs-*`。
 - 本包不含遥测、上传、日志回传或远程资源。
 
+## 致谢与参考
+
+**开源依赖**
+- GrapesJS、Vue 3、Tauri 2、html2canvas、html-to-image、jsPDF 等
+
+**视觉 / 工作流参考**
+- 小红书知识卡片
+- baoyu 系列 skill
+- guizang-ppt-skill（参考了其中的 PPT 动画代码与思路）
+
+各项目版权归原作者所有，使用时请遵守各自许可证。
+
 ## 许可
 
 MIT License
