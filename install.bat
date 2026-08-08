@@ -2,9 +2,23 @@
 setlocal
 cd /d "%~dp0"
 
+rem Find a Python 3.10+ interpreter. Prefer "python" on PATH; fall back to the
+rem "py" launcher (the python.org installer often does not add python to PATH).
+rem The version probe also skips the Microsoft Store stub, which resolves as
+rem "python" but cannot create a venv.
+set "PYCMD="
 where python >nul 2>nul
-if errorlevel 1 (
-  echo Python not found. Please install Python 3.10 or newer first.
+if not errorlevel 1 (
+  for /f "delims=" %%v in ('python -c "import sys;print(1 if sys.version_info>=(3,10) else 0)" 2^>nul') do if "%%v"=="1" set "PYCMD=python"
+)
+if not defined PYCMD (
+  where py >nul 2>nul
+  if not errorlevel 1 (
+    for /f "delims=" %%v in ('py -3 -c "import sys;print(1 if sys.version_info>=(3,10) else 0)" 2^>nul') do if "%%v"=="1" set "PYCMD=py -3"
+  )
+)
+if not defined PYCMD (
+  echo Python 3.10+ not found. Please install Python 3.10 or newer first.
   echo   Windows: winget install Python.Python.3.12
   echo   or download from https://www.python.org/downloads/
   echo Then run this script again.
@@ -14,7 +28,7 @@ if errorlevel 1 (
 
 if not exist ".venv\Scripts\python.exe" (
   echo Creating virtual environment...
-  python -m venv .venv
+  %PYCMD% -m venv .venv
   if errorlevel 1 (
     echo Failed to create virtual environment.
     call :maybe_pause %*
