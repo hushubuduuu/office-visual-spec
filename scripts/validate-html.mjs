@@ -19,7 +19,7 @@ try {
   ok("存在 <style>", /<style[\s>]/i.test(html));
   ok("无远程样式表", !/<link[^>]+rel=["']stylesheet["'][^>]*>/i.test(html));
   ok("无 @import", !/@import/i.test(html));
-    const styleBlock = (html.match(/<style>([\s\S]*?)<\/style>/) || [])[1] || "";
+    const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/i) || [])[1] || "";
   ok("无远程字体", !/fonts\.googleapis|fonts\.gstatic|cdnjs|unpkg|jsdelivr/i.test(html) && !/url\(\s*['"]?https?:\/\//i.test(styleBlock));
 
   const sectionSheets = (html.match(/<section[^>]*class="[^"]*sheet/i) || []).length;

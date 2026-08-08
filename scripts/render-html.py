@@ -139,6 +139,8 @@ def profile(html_path, web=False, width=None):
 
 def check_overflow(html_path, web=False):
     rows, _, _ = profile(html_path, web=web)
+    if not rows:
+        raise SystemExit("未找到 .sheet 分页容器（或 .canvas 画布）。请检查 HTML 是否按规范使用 div.sheet 分页，或确认模板结构。")
     bad = []
     for idx, sh, ch in rows:
         if ch == 0:

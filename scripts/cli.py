@@ -27,6 +27,17 @@ def _relaunch_in_venv():
     if current == venv_py.resolve():
         return False
     argv = [str(venv_py), str(Path(sys.argv[0]).resolve())] + sys.argv[1:]
+    if os.name == "nt":
+        # os.execv on Windows does not preserve the child's exit code (the
+        # original process exits 0 regardless of the venv interpreter's
+        # result), so failure signaling would be lost for agents/CI. Run the
+        # venv interpreter as a child and mirror its exit code instead.
+        try:
+            import subprocess
+            rc = subprocess.call(argv)
+        except OSError:
+            return False
+        raise SystemExit(rc)
     try:
         os.execv(str(venv_py), argv)
     except OSError:
@@ -37,6 +48,16 @@ def _relaunch_in_venv():
 
 
 def run_main(fn, next_step=""):
+    # Force UTF-8 on stdout/stderr. On Windows, redirected output (agent
+    # capture, > file, CI) falls back to the ANSI codepage (GBK/cp1252) and
+    # crashes on ✅/❌/⚠️ or CJK. Console output is already UTF-8, so this is
+    # a no-op there. Applied before the venv relaunch so both interpreters
+    # get it.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
     if _relaunch_in_venv():
         return  # process was replaced by the venv interpreter
     try:

@@ -46,8 +46,11 @@ def detect_browser():
     override = os.environ.get("OVS_BROWSER", "").strip()
     if override:
         candidate = Path(override)
-        if candidate.exists() or shutil.which(override):
+        if candidate.exists():
             return candidate
+        found = shutil.which(override)
+        if found:
+            return Path(found)
         raise SystemExit("OVS_BROWSER 指向的浏览器不存在：" + override)
     for candidate in BROWSER_CANDIDATES:
         if candidate.exists():
@@ -94,7 +97,7 @@ def _sandbox_supported(browser):
     global _sandbox_state
     if _sandbox_state is not None:
         return _sandbox_state
-    with tempfile.TemporaryDirectory(prefix="ovs-sandbox-probe-") as td:
+    with tempfile.TemporaryDirectory(prefix="ovs-sandbox-probe-", ignore_cleanup_errors=True) as td:
         args = [
             "--user-data-dir=" + td,
             "--virtual-time-budget=1500",

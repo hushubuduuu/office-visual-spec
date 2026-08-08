@@ -9,7 +9,12 @@ if exist ".venv\Scripts\python.exe" (
   if not errorlevel 1 (
     python scripts\doctor.py
   ) else (
-    py -3 scripts\doctor.py
+    where py >nul 2>nul
+    if not errorlevel 1 (
+      py -3 scripts\doctor.py
+    ) else (
+      echo Python not found. Run install.bat first, or install Python 3.10+ from https://www.python.org/downloads/
+    )
   )
 )
 set "OVS_RC=%errorlevel%"
