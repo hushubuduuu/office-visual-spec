@@ -41,6 +41,20 @@ BROWSER_COMMANDS = [
 _sandbox_state = None
 _sandbox_warned = False
 
+# --virtual-time-budget is known to hang the headless process on macOS
+# (chromium issue 40219957): the virtual clock never advances, so dump /
+# screenshot / print never fire and the call hits the timeout. We cache the
+# first hang and retry without the budget flag from then on.
+_budget_ok = None  # None = untested; True = works; False = hangs
+
+# Injected into shot/pdf pages when the budget path hangs: forces CSS
+# animations/transitions to complete instantly, so the captured frame equals
+# the post-animation state without virtual-time fast-forwarding.
+ANIM_COMPRESS_CSS = (
+    "*{animation-duration:0.01s !important;animation-delay:0s !important;"
+    "transition-duration:0.01s !important}"
+)
+
 
 def detect_browser():
     override = os.environ.get("OVS_BROWSER", "").strip()
@@ -104,6 +118,21 @@ def flags(*extra):
     return base + list(extra)
 
 
+def _run_probe_direct(browser, args_fn, budget_ms, timeout=15):
+    """Like run_headless_budget_safe but bypasses the sandbox probe (used
+    inside _sandbox_supported itself to avoid recursion)."""
+    global _budget_ok
+    if _budget_ok is not False:
+        try:
+            r = subprocess.run([str(browser)] + flags(*args_fn("--virtual-time-budget=%d" % budget_ms)), capture_output=True, timeout=timeout)
+            if r.returncode == 0:
+                return r
+        except subprocess.TimeoutExpired:
+            pass
+        _budget_ok = False
+    return subprocess.run([str(browser)] + flags(*args_fn(None)), capture_output=True, timeout=timeout)
+
+
 def _sandbox_supported(browser):
     global _sandbox_state
     if _sandbox_state is not None:
@@ -114,14 +143,13 @@ def _sandbox_supported(browser):
         # user-data-dir (singleton locks, partial files) and can crash a
         # retry that reuses it.
         with tempfile.TemporaryDirectory(prefix="ovs-sandbox-probe-", ignore_cleanup_errors=True) as td:
-            args = [
-                "--user-data-dir=" + td,
-                "--virtual-time-budget=1500",
-                "--dump-dom",
-                "about:blank",
-            ]
+            def args_fn(budget):
+                a = list(extra) + ["--user-data-dir=" + td, "--dump-dom", "about:blank"]
+                if budget:
+                    a.insert(1, budget)
+                return a
             try:
-                r = subprocess.run([str(browser)] + extra + flags(*args), capture_output=True, timeout=15)
+                r = _run_probe_direct(browser, args_fn, 1500)
                 return r.returncode == 0
             except subprocess.TimeoutExpired:
                 return False
@@ -148,3 +176,30 @@ def run_headless(browser, args, timeout=None):
             _sandbox_warned = True
         return subprocess.run([str(browser), "--no-sandbox"] + flags(*args), capture_output=True, timeout=timeout)
     return subprocess.run([str(browser)] + flags(*args), capture_output=True, timeout=timeout)
+
+
+def run_headless_budget_safe(browser, args_fn, budget_ms, timeout, extra_flags=(), prepare_fallback=None):
+    """Run headless Chrome, retrying without --virtual-time-budget on hang.
+
+    args_fn(budget_flag_or_None) builds the full argument list (minus the
+    common flags). On the first hang or nonzero budget run we retry once
+    without the budget flag and cache the result, so subsequent calls skip the
+    doomed budget attempt. prepare_fallback() may rebuild the input page
+    (e.g. inject ANIM_COMPRESS_CSS) before the no-budget retry.
+    """
+    global _budget_ok
+    if _budget_ok is not False and budget_ms:
+        try:
+            r = run_headless(
+                browser,
+                list(extra_flags) + args_fn("--virtual-time-budget=%d" % budget_ms),
+                timeout=timeout,
+            )
+            if r.returncode == 0:
+                return r
+        except subprocess.TimeoutExpired:
+            pass
+        _budget_ok = False
+        if prepare_fallback:
+            prepare_fallback()
+    return run_headless(browser, list(extra_flags) + args_fn(None), timeout=timeout)

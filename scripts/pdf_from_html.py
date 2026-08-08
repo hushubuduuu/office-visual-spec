@@ -11,7 +11,7 @@ from pathlib import Path
 # NOTE: no third-party imports at module level; the venv bootstrap in
 # cli.run_main() must be reachable before any dependency is loaded.
 
-from chrome_common import find_browser, run_headless
+from chrome_common import find_browser, run_headless_budget_safe
 from cli import run_main
 
 PAGE_SIZES = {
@@ -51,14 +51,16 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     tmp = make_temp_html(source, args.size)
     try:
-        r = run_headless(
+        def args_fn(budget):
+            a = ["--print-to-pdf=" + str(out), "--no-pdf-header-footer"]
+            if budget:
+                a.append(budget)
+            a.append(tmp.as_uri())
+            return a
+        r = run_headless_budget_safe(
             find_browser(),
-            [
-                "--print-to-pdf=" + str(out),
-                "--no-pdf-header-footer",
-                "--virtual-time-budget=3000",
-                tmp.as_uri(),
-            ],
+            args_fn,
+            3000,
             timeout=120,
         )
         if r.returncode != 0:

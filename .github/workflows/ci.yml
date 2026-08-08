@@ -98,6 +98,9 @@ jobs:
         run: python scripts/render-html.py a4 templates/a4-summary.html --check-only
 
       - name: Full export a4 (assert PNG size and PDF pages)
+        # windows-latest default shell is PowerShell, which has no bash
+        # heredoc; run this step under Git Bash instead.
+        shell: bash
         run: |
           python scripts/render-html.py a4 templates/a4-summary.html out/
           python - <<'PY'

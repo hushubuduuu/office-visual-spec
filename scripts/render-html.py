@@ -27,7 +27,7 @@ from pathlib import Path
 # a top-level third-party import would crash before the bootstrap can re-exec
 # under .venv. PIL is only needed for the mobile-long PDF branch below.
 
-from chrome_common import find_browser, flags as chrome_flags, run_headless
+from chrome_common import find_browser, run_headless, run_headless_budget_safe, ANIM_COMPRESS_CSS
 from cli import run_main
 
 # "sheet" is the logical CSS canvas. "png" is the same logical size;
@@ -73,13 +73,6 @@ def cleanup_file(path):
             time.sleep(0.2)
 
 
-def chrome(args, timeout=120):
-    result = run_headless(find_browser(), ["--hide-scrollbars"] + args, timeout=timeout)
-    if result.returncode != 0:
-        print("浏览器渲染失败，错误信息：" + result.stderr.decode("utf-8", "ignore")[-300:], flush=True)
-    return result.returncode
-
-
 def profile(html_path, web=False, width=None):
     """Return (sheet_rows, page_height, page_width).
 
@@ -89,7 +82,17 @@ def profile(html_path, web=False, width=None):
     a different height than the target-width screenshot).
     """
     delay = 1600 if web else 1200
+    # Measure immediately (sync) so a no-budget dump captures the title, and
+    # re-measure after the delay (the virtual-time-budget fast-forward path).
     probe = """<script>
+    (function(){
+      var out = Array.from(document.querySelectorAll('.sheet, .canvas')).map(function(s,i){
+        return (i+1)+':' + Math.round(s.scrollHeight) + '/' + Math.round(s.clientHeight);
+      }).join(',');
+      var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      var w = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);
+      document.title='PROFILE|' + out + '|H' + h + '|W' + w;
+    })();
     setTimeout(function(){
       var out = Array.from(document.querySelectorAll('.sheet, .canvas')).map(function(s,i){
         return (i+1)+':' + Math.round(s.scrollHeight) + '/' + Math.round(s.clientHeight);
@@ -104,25 +107,26 @@ def profile(html_path, web=False, width=None):
     tmp = Path(tmpdir) / "probe.html"
     write(tmp, s)
     udd = tempfile.mkdtemp(prefix="ovs-probe-")
-    args = ["--user-data-dir=" + udd, "--virtual-time-budget=6000", "--dump-dom"]
-    if width:
-        args.insert(2, "--window-size=%d,1200" % width)
-    args.append(Path(tmp).resolve().as_uri())
+
+    def args_fn(budget):
+        a = ["--user-data-dir=" + udd, "--dump-dom"]
+        if width:
+            a.append("--window-size=%d,1200" % width)
+        if budget:
+            a.append(budget)
+        a.append(Path(tmp).resolve().as_uri())
+        return a
+
     try:
-        result = run_headless(
-            find_browser(),
-            args,
-            timeout=60,
-        )
+        result = run_headless_budget_safe(find_browser(), args_fn, 6000, timeout=20)
         if result.returncode != 0:
             raise SystemExit("浏览器渲染失败，错误信息：" + result.stderr.decode("utf-8", "ignore")[-300:])
         dom = result.stdout.decode("utf-8", "ignore")
     except subprocess.TimeoutExpired:
         raise SystemExit(
-            "浏览器探针超时：页面 60 秒内未完成渲染，无法测量尺寸。"
-            "已知问题：playwright 自带的 chromium 主构建（路径含 ms-playwright 且不是 headless-shell）"
-            "与 headless 探针不兼容会挂起；请改用 Chrome / Edge / Chromium，"
-            "或把 OVS_BROWSER 指向 playwright 的 chrome-headless-shell。"
+            "浏览器探针超时：页面 20 秒内未完成渲染，无法测量尺寸。"
+            "请检查 HTML 是否完整；如用 OVS_BROWSER 指定了不兼容的浏览器，"
+            "请改用 Chrome / Edge / Chromium，或指向 playwright 的 chrome-headless-shell。"
         )
     finally:
         cleanup_dir(udd)
@@ -171,39 +175,66 @@ def shot(html_path, out_png, w, h, scale, extra_css="", extra_js="", budget=1200
     tmp = Path(tmpdir) / "shot.html"
     write(tmp, s)
     udd = tempfile.mkdtemp(prefix="ovs-shot-")
-    args = ["--user-data-dir=" + udd, "--window-size=%d,%d" % (w, h),
-            "--force-device-scale-factor=%d" % scale,
-            "--virtual-time-budget=%d" % budget,
-            "--screenshot=" + str(out_png), Path(tmp).resolve().as_uri()]
+
+    def args_fn(budget_flag):
+        a = ["--user-data-dir=" + udd, "--window-size=%d,%d" % (w, h),
+             "--force-device-scale-factor=%d" % scale]
+        if budget_flag:
+            a.append(budget_flag)
+        a += ["--screenshot=" + str(out_png), Path(tmp).resolve().as_uri()]
+        return a
+
+    def prepare_fallback():
+        # No virtual-time fast-forward: force CSS animations to finish
+        # instantly so the frame equals the post-animation state.
+        nonlocal tmp
+        s = read(html_path)
+        s = s.replace("</head>", "<style>" + extra_css + ANIM_COMPRESS_CSS + "</style></head>")
+        if extra_js:
+            s = s.replace("</body>", "<script>" + extra_js + "</script></body>")
+        tmp = Path(tmpdir) / "shot.html"
+        write(tmp, s)
+
     try:
-        rc = chrome(args)
+        result = run_headless_budget_safe(find_browser(), args_fn, budget, timeout=120, prepare_fallback=prepare_fallback)
     finally:
         cleanup_dir(udd)
         cleanup_dir(tmpdir)
-    return rc
+    return result.returncode
 
 
 def to_pdf(html_path, out_pdf, budget=15000, extra_css=""):
     target = html_path
-    tmpdir = None
+    tmpdir = tempfile.mkdtemp(prefix="ovs-pdf-html-")
     if extra_css:
         s = read(html_path).replace("</head>", "<style>" + extra_css + "</style></head>")
-        tmpdir = tempfile.mkdtemp(prefix="ovs-pdf-html-")
         tmp = Path(tmpdir) / "pdf-extra.html"
         write(tmp, s)
         target = tmp
     udd = tempfile.mkdtemp(prefix="ovs-pdf-")
-    args = ["--user-data-dir=" + udd, "--print-to-pdf=" + str(out_pdf),
-            "--print-to-pdf-no-header", "--no-pdf-header-footer",
-            "--virtual-time-budget=%d" % budget,
-            Path(target).resolve().as_uri()]
+
+    def args_fn(budget_flag):
+        a = ["--user-data-dir=" + udd, "--print-to-pdf=" + str(out_pdf),
+             "--print-to-pdf-no-header", "--no-pdf-header-footer"]
+        if budget_flag:
+            a.append(budget_flag)
+        a.append(Path(target).resolve().as_uri())
+        return a
+
+    def prepare_fallback():
+        nonlocal target
+        s = read(html_path)
+        s = s.replace("</head>", "<style>" + extra_css + ANIM_COMPRESS_CSS + "</style></head>")
+        tmp = Path(tmpdir) / "pdf-extra.html"
+        write(tmp, s)
+        target = tmp
+
     try:
-        rc = chrome(args, timeout=180)
+        result = run_headless_budget_safe(find_browser(), args_fn, budget, timeout=180, prepare_fallback=prepare_fallback)
     finally:
         cleanup_dir(udd)
-        if tmpdir:
-            cleanup_dir(tmpdir)
-    return rc
+        cleanup_dir(tmpdir)
+    return result.returncode
 
 
 def main():
