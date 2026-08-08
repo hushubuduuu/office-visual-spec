@@ -11,7 +11,7 @@ description: |
 
 ## 0. AI 执行摘要（每次必读）
 
-0. **环境自检（每次必做）**：先运行 `python scripts/doctor.py`（统一用 `.venv` 内 python：Win `.venv\Scripts\python.exe`，Mac/Linux `.venv/bin/python`；没有 `.venv` 先跑 install.bat / install.sh，doctor 会自动切换）。未通过前不开始生成；AI 给 bat 加 `/nopause` 或设 `OVS_NO_PAUSE=1`；浏览器检测失败设 `OVS_BROWSER`。缺系统依赖时 agent 负责装：Win `winget install Python.Python.3.12`（浏览器用自带 Edge）；Mac `brew install python@3.12` + `brew install --cask google-chrome`（Safari 不支持 headless）；装完重跑 doctor。
+0. **环境自检（每次必做）**：先运行 `python scripts/doctor.py`（统一用 .venv 内 python：Win `.venv\Scripts\python.exe`，Mac/Linux `.venv/bin/python`；没有 .venv 先跑 install.bat / install.sh，doctor 会自动切换）。未通过前不开始生成；AI 给 bat 加 `/nopause` 或设 `OVS_NO_PAUSE=1`。缺系统依赖时 agent 负责装：Win 用 `winget install Python.Python.3.12`，浏览器用自带 Edge 无需安装；Mac 用 `brew install python@3.12` + `brew install --cask google-chrome`（Safari 不支持 headless）；装完重跑 doctor。浏览器已装但检测失败时设 `OVS_BROWSER` 后重跑 doctor。
 1. 最高优先级：先问，再写；信息不够不开始生成。
 2. 信息足够后进入排版阶段：画面比例（间距、页边距、对齐）是第一要素，先定骨架，避免内容挤在一起或贴边。
 3. 先读 `references/README.md` 二级索引，由它路由到类型文件和共享文件。
