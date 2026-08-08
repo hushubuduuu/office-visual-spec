@@ -8,13 +8,15 @@ import argparse
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageChops
+# NOTE: no third-party imports at module level; the venv bootstrap in
+# cli.run_main() must be reachable before any dependency is loaded.
 
 from chrome_common import find_browser, run_headless
 from cli import run_main
 
 
 def main():
+    from PIL import Image, ImageChops  # deferred: keeps the import-time chain third-party-free
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)

@@ -12,34 +12,48 @@ import sys
 from pathlib import Path
 from cli import run_main
 
-from pptx import Presentation
-from pptx.dml.color import RGBColor
-from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import MSO_AUTO_SIZE, PP_ALIGN
-from pptx.oxml.ns import qn
-from pptx.util import Inches, Pt
+# NOTE: no third-party imports at module level; the venv bootstrap in
+# cli.run_main() must be reachable before any dependency is loaded. All
+# pptx symbols and design tokens are initialized lazily in _init_pptx().
 
-PAPER = RGBColor(0xFA, 0xF8, 0xF5)
-INK = RGBColor(0x22, 0x1E, 0x1A)
-BODY = RGBColor(0x44, 0x3F, 0x3A)
-NARRATIVE = RGBColor(0x55, 0x4F, 0x49)
-MUTED = RGBColor(0x8E, 0x87, 0x7F)
-RED = RGBColor(0xC6, 0x0D, 0x0D)
-DEEP_RED = RGBColor(0xA5, 0x0A, 0x0A)
-DIVIDER = RGBColor(0xE2, 0xDD, 0xD5)
-CARD = RGBColor(0xFD, 0xF9, 0xF7)
-ON_ACCENT = RGBColor(0xFA, 0xF8, 0xF5)
 TITLE_FONT = "\u5fae\u8f6f\u96c5\u9ed1"
 BODY_FONT = "\u5b8b\u4f53"
 
-prs = Presentation()
-prs.slide_width = Inches(13.333)
-prs.slide_height = Inches(7.5)
-
-s_emu = min(prs.slide_width, prs.slide_height)
-s_in = s_emu / 914400 / 100
-s_pt = s_emu / 12700 / 100
+prs = None
+s_emu = s_in = s_pt = 0
 slide_no = 0
+PAPER = INK = BODY = NARRATIVE = MUTED = RED = DEEP_RED = DIVIDER = CARD = ON_ACCENT = None
+
+
+def _init_pptx():
+    global prs, s_emu, s_in, s_pt, slide_no
+    global PAPER, INK, BODY, NARRATIVE, MUTED, RED, DEEP_RED, DIVIDER, CARD, ON_ACCENT
+    global Presentation, RGBColor, MSO_SHAPE, PP_ALIGN, MSO_AUTO_SIZE, qn, Inches, Pt
+    from pptx import Presentation
+    from pptx.dml.color import RGBColor
+    from pptx.enum.shapes import MSO_SHAPE
+    from pptx.enum.text import MSO_AUTO_SIZE, PP_ALIGN
+    from pptx.oxml.ns import qn
+    from pptx.util import Inches, Pt
+    PAPER = RGBColor(0xFA, 0xF8, 0xF5)
+    INK = RGBColor(0x22, 0x1E, 0x1A)
+    BODY = RGBColor(0x44, 0x3F, 0x3A)
+    NARRATIVE = RGBColor(0x55, 0x4F, 0x49)
+    MUTED = RGBColor(0x8E, 0x87, 0x7F)
+    RED = RGBColor(0xC6, 0x0D, 0x0D)
+    DEEP_RED = RGBColor(0xA5, 0x0A, 0x0A)
+    DIVIDER = RGBColor(0xE2, 0xDD, 0xD5)
+    CARD = RGBColor(0xFD, 0xF9, 0xF7)
+    ON_ACCENT = RGBColor(0xFA, 0xF8, 0xF5)
+
+    prs = Presentation()
+    prs.slide_width = Inches(13.333)
+    prs.slide_height = Inches(7.5)
+
+    s_emu = min(prs.slide_width, prs.slide_height)
+    s_in = s_emu / 914400 / 100
+    s_pt = s_emu / 12700 / 100
+    slide_no = 0
 
 
 def U(n):
@@ -79,7 +93,9 @@ def set_bg(slide, color):
     slide.background.fill.fore_color.rgb = color
 
 
-def add_text(slide, x, y, w, h, text, size, color, bold=False, align=PP_ALIGN.LEFT, font=BODY_FONT):
+def add_text(slide, x, y, w, h, text, size, color, bold=False, align=None, font=BODY_FONT):
+    if align is None:
+        align = PP_ALIGN.LEFT
     box = slide.shapes.add_textbox(U(x), U(y), U(w), U(h))
     tf = box.text_frame
     tf.clear()
@@ -92,7 +108,9 @@ def add_text(slide, x, y, w, h, text, size, color, bold=False, align=PP_ALIGN.LE
     return box
 
 
-def add_rect(slide, x, y, w, h, fill=None, line=None, line_w=1.0, shape=MSO_SHAPE.RECTANGLE):
+def add_rect(slide, x, y, w, h, fill=None, line=None, line_w=1.0, shape=None):
+    if shape is None:
+        shape = MSO_SHAPE.RECTANGLE
     sp = slide.shapes.add_shape(shape, U(x), U(y), U(w), U(h))
     if fill is None:
         sp.fill.background()
@@ -295,6 +313,7 @@ def colophon_slide():
     footer(slide, next_page())
 
 def main():
+    _init_pptx()
     out = sys.argv[1] if len(sys.argv) > 1 else "\u793a\u4f8b-\u8f93\u51fa.pptx"
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     cover_slide()

@@ -79,8 +79,14 @@ def chrome(args, timeout=120):
     return result.returncode
 
 
-def profile(html_path, web=False):
-    """Return (sheet_rows, page_height, page_width)."""
+def profile(html_path, web=False, width=None):
+    """Return (sheet_rows, page_height, page_width).
+
+    width: when set, the probe runs in a viewport of that width (needed for
+    dynamic types like html-page/mobile-long whose layout depends on the
+    content width; the default headless viewport is 800px and would measure
+    a different height than the target-width screenshot).
+    """
     delay = 1600 if web else 1200
     probe = """<script>
     setTimeout(function(){
@@ -93,18 +99,18 @@ def profile(html_path, web=False):
     }, %d);
     </script></body>""" % delay
     s = read(html_path).replace("</body>", probe)
-    tmp = html_path + ".probe.html"
+    tmpdir = tempfile.mkdtemp(prefix="ovs-probe-html-")
+    tmp = Path(tmpdir) / "probe.html"
     write(tmp, s)
     udd = tempfile.mkdtemp(prefix="ovs-probe-")
+    args = ["--user-data-dir=" + udd, "--virtual-time-budget=6000", "--dump-dom"]
+    if width:
+        args.insert(2, "--window-size=%d,1200" % width)
+    args.append(Path(tmp).resolve().as_uri())
     try:
         result = run_headless(
             find_browser(),
-            [
-                "--user-data-dir=" + udd,
-                "--virtual-time-budget=6000",
-                "--dump-dom",
-                Path(tmp).resolve().as_uri(),
-            ],
+            args,
             timeout=60,
         )
         if result.returncode != 0:
@@ -112,7 +118,7 @@ def profile(html_path, web=False):
         dom = result.stdout.decode("utf-8", "ignore")
     finally:
         cleanup_dir(udd)
-        cleanup_file(tmp)
+        cleanup_dir(tmpdir)
     if "PROFILE|" not in dom:
         raise SystemExit("无法读取页面尺寸，请检查 HTML 文件是否完整，或用 OVS_DEBUG=1 查看详细错误。")
     m = re.search(r"<title>(PROFILE\|[^<]*)</title>", dom)
@@ -133,10 +139,14 @@ def profile(html_path, web=False):
 
 def check_overflow(html_path, web=False):
     rows, _, _ = profile(html_path, web=web)
-    bad = [r for r in rows if r[2] and r[1] > r[2] + 1]
+    bad = []
+    for idx, sh, ch in rows:
+        if ch == 0:
+            bad.append("sheet %d 高度为 0（可能被 CSS 隐藏，请检查 display/height）" % idx)
+        elif sh > ch + 1:
+            bad.append("sheet %d: %d > %d" % (idx, sh, ch))
     if bad:
-        msg = "; ".join("sheet %d: %d > %d" % r for r in bad)
-        raise SystemExit("页面内容超出画布，请精简内容后重试。详情：" + msg)
+        raise SystemExit("页面内容超出画布，请精简内容后重试。详情：" + "; ".join(bad))
     return rows
 
 
@@ -147,7 +157,8 @@ def shot(html_path, out_png, w, h, scale, extra_css="", extra_js="", budget=1200
     s = s.replace("</head>", css + "</head>")
     if extra_js:
         s = s.replace("</body>", js + "</body>")
-    tmp = html_path + ".shot.html"
+    tmpdir = tempfile.mkdtemp(prefix="ovs-shot-html-")
+    tmp = Path(tmpdir) / "shot.html"
     write(tmp, s)
     udd = tempfile.mkdtemp(prefix="ovs-shot-")
     args = ["--user-data-dir=" + udd, "--window-size=%d,%d" % (w, h),
@@ -158,16 +169,17 @@ def shot(html_path, out_png, w, h, scale, extra_css="", extra_js="", budget=1200
         rc = chrome(args)
     finally:
         cleanup_dir(udd)
-        cleanup_file(tmp)
+        cleanup_dir(tmpdir)
     return rc
 
 
 def to_pdf(html_path, out_pdf, budget=15000, extra_css=""):
     target = html_path
-    tmp = None
+    tmpdir = None
     if extra_css:
         s = read(html_path).replace("</head>", "<style>" + extra_css + "</style></head>")
-        tmp = html_path + ".pdf-extra.html"
+        tmpdir = tempfile.mkdtemp(prefix="ovs-pdf-html-")
+        tmp = Path(tmpdir) / "pdf-extra.html"
         write(tmp, s)
         target = tmp
     udd = tempfile.mkdtemp(prefix="ovs-pdf-")
@@ -179,8 +191,8 @@ def to_pdf(html_path, out_pdf, budget=15000, extra_css=""):
         rc = chrome(args, timeout=180)
     finally:
         cleanup_dir(udd)
-        if tmp:
-            cleanup_file(tmp)
+        if tmpdir:
+            cleanup_dir(tmpdir)
     return rc
 
 
@@ -207,7 +219,8 @@ def main():
             check_overflow(str(src), web=args.type == "ppt-web")
             print("PASS: overflow check")
         else:
-            _, height, _ = profile(str(src), web=args.type == "ppt-web")
+            w = args.width or cfg.get("width", 1280)
+            _, height, _ = profile(str(src), web=args.type == "ppt-web", width=w)
             if not height:
                 raise SystemExit("无法读取页面高度，请检查 HTML 文件是否完整，或用 OVS_DEBUG=1 查看详细错误。")
             print("PASS: profile height", height)
@@ -263,10 +276,10 @@ def main():
     else:
         png = out / "png" / ("%s-full.png" % args.type)
         if cfg.get("dynamic"):
-            _, height, _ = profile(str(src))
+            w = args.width or cfg.get("width", 1280)
+            _, height, _ = profile(str(src), web=args.type == "ppt-web", width=w)
             if not height:
                 raise SystemExit("无法获取页面高度，已停止渲染，避免输出尺寸错误的图片。")
-            w = args.width or cfg.get("width", 1280)
             h = height
             print("profile height:", h)
         else:
@@ -277,6 +290,8 @@ def main():
 
     pdf = out / "pdf" / ("%s.pdf" % args.type)
     if args.type == "mobile-long":
+        if rc != 0 or not png.exists():
+            raise SystemExit("PNG 截图失败，已跳过 PDF 生成。请先处理上面的截图错误。")
         from PIL import Image  # deferred import: keeps the import-time chain third-party-free
         with Image.open(str(png)) as im:
             im.convert("RGB").save(str(pdf), "PDF", resolution=96.0)

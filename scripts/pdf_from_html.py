@@ -8,7 +8,8 @@ import argparse
 import tempfile
 from pathlib import Path
 
-import fitz
+# NOTE: no third-party imports at module level; the venv bootstrap in
+# cli.run_main() must be reachable before any dependency is loaded.
 
 from chrome_common import find_browser, run_headless
 from cli import run_main
@@ -37,6 +38,7 @@ def make_temp_html(source: Path, page_size: str) -> Path:
 
 
 def main():
+    import fitz  # deferred: keeps the import-time chain third-party-free
     parser = argparse.ArgumentParser()
     parser.add_argument("output", nargs="?", default="\u793a\u4f8b-\u8bfe\u7a0b\u7eaa\u8981.pdf")
     parser.add_argument("size", nargs="?", choices=list(PAGE_SIZES), default="a4")

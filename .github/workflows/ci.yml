@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Chromium (playwright)
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+          echo "CHROME_PATH=$(find "$HOME/.cache/ms-playwright" -name chrome -type f | head -1)" >> "$GITHUB_ENV"
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+
+      - name: Doctor
+        env:
+          OVS_BROWSER: ${{ env.CHROME_PATH }}
+        run: python scripts/doctor.py
+
+      - name: Validate all templates
+        run: |
+          for t in a4-summary ppt-16-9 ppt-web html-page xhs-cards mobile-long infographic long-essay; do
+            node scripts/validate-html.mjs "templates/$t.html"
+          done
+
+      - name: Overflow check all types
+        env:
+          OVS_BROWSER: ${{ env.CHROME_PATH }}
+        run: |
+          python scripts/render-html.py a4 templates/a4-summary.html --check-only
+          python scripts/render-html.py html-ppt templates/ppt-16-9.html --check-only
+          python scripts/render-html.py ppt-web templates/ppt-web.html --check-only
+          python scripts/render-html.py html-page templates/html-page.html --check-only
+          python scripts/render-html.py xhs templates/xhs-cards.html --check-only
+          python scripts/render-html.py mobile-long templates/mobile-long.html --check-only
+          python scripts/render-html.py infographic templates/infographic.html --check-only
+
+      - name: Full export a4 (assert PNG size and PDF pages)
+        env:
+          OVS_BROWSER: ${{ env.CHROME_PATH }}
+        run: |
+          python scripts/render-html.py a4 templates/a4-summary.html out/
+          python - <<'PY'
+          from PIL import Image
+          img = Image.open("out/png/a4-full.png")
+          expect = (794 * 2, 6 * 1123 * 2)
+          assert img.size == expect, f"a4-full.png size {img.size} != {expect}"
+          import fitz
+          doc = fitz.open("out/pdf/a4.pdf")
+          assert doc.page_count == 6, f"a4.pdf pages {doc.page_count} != 6"
+          print("a4 export OK:", img.size, doc.page_count, "pages")
+          PY
