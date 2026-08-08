@@ -41,11 +41,16 @@ BROWSER_COMMANDS = [
 _sandbox_state = None
 _sandbox_warned = False
 
-# --virtual-time-budget is known to hang the headless process on macOS
-# (chromium issue 40219957): the virtual clock never advances, so dump /
+# --virtual-time-budget is known to hang the headless process on some
+# environments (chromium issue 40219957, intermittent / environment-dependent
+# rather than macOS-specific): the virtual clock never advances, so dump /
 # screenshot / print never fire and the call hits the timeout. We cache the
 # first hang and retry without the budget flag from then on.
 _budget_ok = None  # None = untested; True = works; False = hangs
+
+# Hard-disable the budget path (CI coverage of the fallback path).
+if os.environ.get("OVS_NO_VIRTUAL_TIME", "").lower() in ("1", "true", "yes"):
+    _budget_ok = False
 
 # Injected into shot/pdf pages when the budget path hangs: forces CSS
 # animations/transitions to complete instantly, so the captured frame equals
@@ -54,6 +59,12 @@ ANIM_COMPRESS_CSS = (
     "*{animation-duration:0.01s !important;animation-delay:0s !important;"
     "transition-duration:0.01s !important}"
 )
+
+# print-to-pdf is a synchronous snapshot taken at t=0, so even a compressed
+# animation still captures the first keyframe (fill-mode:both from{opacity:0}
+# renders blank). For PDFs we instead drop animations entirely so elements
+# render their static (post-animation) styles.
+ANIM_STATIC_CSS = "*{animation:none !important;transition:none !important}"
 
 
 def detect_browser():
@@ -124,16 +135,22 @@ def flags(*extra):
 
 def _run_probe_direct(browser, args_fn, budget_ms, timeout=15):
     """Like run_headless_budget_safe but bypasses the sandbox probe (used
-    inside _sandbox_supported itself to avoid recursion)."""
+    inside _sandbox_supported itself to avoid recursion).
+
+    Only a hang (TimeoutExpired) marks the budget path as broken. A nonzero
+    exit code is a real failure of this particular run and must NOT poison the
+    process-wide _budget_ok cache, otherwise every later export silently skips
+    the budget path (no animation fast-forward) on a macOS/CI run.
+    """
     global _budget_ok
     if _budget_ok is not False:
         try:
             r = subprocess.run([str(browser)] + flags(*args_fn("--virtual-time-budget=%d" % budget_ms)), capture_output=True, timeout=timeout)
             if r.returncode == 0:
                 return r
+            return r
         except subprocess.TimeoutExpired:
-            pass
-        _budget_ok = False
+            _budget_ok = False
     return subprocess.run([str(browser)] + flags(*args_fn(None)), capture_output=True, timeout=timeout)
 
 
@@ -190,10 +207,11 @@ def run_headless_budget_safe(browser, args_fn, budget_ms, timeout, extra_flags=(
     """Run headless Chrome, retrying without --virtual-time-budget on hang.
 
     args_fn(budget_flag_or_None) builds the full argument list (minus the
-    common flags). On the first hang or nonzero budget run we retry once
-    without the budget flag and cache the result, so subsequent calls skip the
-    doomed budget attempt. prepare_fallback() may rebuild the input page
-    (e.g. inject ANIM_COMPRESS_CSS) before the no-budget retry.
+    common flags). Only a hang (TimeoutExpired) triggers the no-budget retry:
+    a nonzero exit code is a real rendering error and is returned as-is, so a
+    genuine failure is never masked by a fallback rerun. prepare_fallback() may
+    rebuild the input page (e.g. inject ANIM_COMPRESS_CSS / ANIM_STATIC_CSS)
+    before the no-budget retry.
     """
     global _budget_ok
     if _budget_ok is not False and budget_ms:
@@ -205,6 +223,7 @@ def run_headless_budget_safe(browser, args_fn, budget_ms, timeout, extra_flags=(
             )
             if r.returncode == 0:
                 return r
+            return r
         except subprocess.TimeoutExpired:
             pass
         _budget_ok = False

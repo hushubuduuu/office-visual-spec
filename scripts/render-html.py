@@ -28,7 +28,7 @@ from pathlib import Path
 # a top-level third-party import would crash before the bootstrap can re-exec
 # under .venv. PIL is only needed for the mobile-long PDF branch below.
 
-from chrome_common import find_browser, run_headless, run_headless_budget_safe, ANIM_COMPRESS_CSS
+from chrome_common import find_browser, run_headless, run_headless_budget_safe, ANIM_COMPRESS_CSS, ANIM_STATIC_CSS
 from cli import run_main
 
 # "sheet" is the logical CSS canvas. "png" is the same logical size;
@@ -134,6 +134,25 @@ def profile(html_path, web=False, width=None):
     finally:
         cleanup_dir(udd)
         cleanup_dir(tmpdir)
+    if "PROFILE|" not in dom and sys.platform == "darwin":
+        # No --user-data-dir on macOS normally (issue 40133981 hangs headless
+        # with a fresh profile dir on some builds), but without it Chrome binds
+        # the user's real default profile: if a Chrome instance is already
+        # running, the headless process loses the singleton lock and dumps
+        # empty. Retry once with a fresh profile dir as a fallback.
+        udd2 = tempfile.mkdtemp(prefix="ovs-probe-udd-")
+        try:
+            args = ["--dump-dom", "--user-data-dir=" + udd2]
+            if width:
+                args.append("--window-size=%d,1200" % width)
+            args.append(Path(tmp).resolve().as_uri())
+            r2 = run_headless(find_browser(), args, timeout=15)
+            if r2.returncode == 0 and "PROFILE|" in r2.stdout.decode("utf-8", "ignore"):
+                dom = r2.stdout.decode("utf-8", "ignore")
+        except subprocess.TimeoutExpired:
+            pass
+        finally:
+            cleanup_dir(udd2)
     if "PROFILE|" not in dom:
         raise SystemExit("无法读取页面尺寸，请检查 HTML 文件是否完整，或用 OVS_DEBUG=1 查看详细错误。")
     m = re.search(r"<title>(PROFILE\|[^<]*)</title>", dom)
@@ -229,9 +248,12 @@ def to_pdf(html_path, out_pdf, budget=15000, extra_css=""):
         return a
 
     def prepare_fallback():
+        # print-to-pdf snapshots at t=0, so even compressed animations still
+        # capture the first keyframe (blank for fill-mode:both fades). Drop
+        # animations entirely so elements render their static styles.
         nonlocal target
         s = read(html_path)
-        s = s.replace("</head>", "<style>" + extra_css + ANIM_COMPRESS_CSS + "</style></head>")
+        s = s.replace("</head>", "<style>" + extra_css + ANIM_STATIC_CSS + "</style></head>")
         tmp = Path(tmpdir) / "pdf-extra.html"
         write(tmp, s)
         target = tmp

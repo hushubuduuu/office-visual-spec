@@ -22,7 +22,10 @@ call :maybe_pause %*
 exit /b %OVS_RC%
 
 :maybe_pause
-if /i "%~1"=="/nopause" exit /b 0
+rem Match /nopause anywhere in the arguments (install.bat style):
+rem "doctor.bat foo /nopause" must not pause either.
+echo %* | findstr /i "/nopause" >nul
+if not errorlevel 1 exit /b 0
 if defined OVS_NO_PAUSE exit /b 0
 if defined CI exit /b 0
 pause

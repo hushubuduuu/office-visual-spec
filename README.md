@@ -111,6 +111,13 @@ node scripts/validate-html.mjs templates/ppt-16-9.html
 | `OVS_NO_SANDBOX` | 设为 `1` 时强制关闭浏览器沙箱（仅容器/CI） |
 | `OVS_DEBUG` | 设为 `1` 时显示完整错误信息 |
 | `OVS_PIP_INDEX` | 自定义 pip 源；未设置时官方源失败会自动切换清华源 |
+| `OVS_NO_VIRTUAL_TIME` | 设为 `1` 时禁用 `--virtual-time-budget`（强制走无预算回退路径，用于 CI/调试） |
+
+## macOS 注意事项
+
+- macOS 渲染时 headless Chrome 默认不创建独立 profile 目录（该模式在部分 macOS 构建上会挂起），改用内存 incognito 会话。**如果开着 Chrome 再跑渲染，headless 实例可能拿不到单例锁而输出空白**：请先关闭正在运行的 Chrome，并避免同时跑多个导出任务（导出任务请串行）。
+- `--virtual-time-budget` 在部分环境会间歇性挂起 headless（chromium issue 40219957，环境相关而非 macOS 专属）：脚本检测到挂起后会自动去掉该参数重试，并把 CSS 动画/过渡压缩到瞬时完成（截图）或禁用（PDF，因为 print-to-pdf 是 t=0 同步快照），保证输出帧等价于动画后状态；PDF 中的 CSS 动画以静态样式呈现。
+- Safari 不支持 headless 渲染（见「依赖」）。
 
 ## 安全
 

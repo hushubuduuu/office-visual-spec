@@ -10,12 +10,18 @@ cd "$(dirname "$0")"
 find_python() {
   for candidate in \
     "python3" \
+    "python3.14" \
     "python3.13" \
     "python3.12" \
+    "python3.11" \
+    "/opt/homebrew/bin/python3.14" \
     "/opt/homebrew/bin/python3.13" \
     "/opt/homebrew/bin/python3.12" \
+    "/opt/homebrew/bin/python3.11" \
+    "/usr/local/bin/python3.14" \
     "/usr/local/bin/python3.13" \
-    "/usr/local/bin/python3.12"; do
+    "/usr/local/bin/python3.12" \
+    "/usr/local/bin/python3.11"; do
     if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
       echo "$candidate"
       return 0
@@ -25,13 +31,19 @@ find_python() {
   if command -v brew >/dev/null 2>&1; then
     prefix="$(brew --prefix 2>/dev/null || true)"
     if [ -n "$prefix" ]; then
-      for minor in 13 12; do
+      for minor in 14 13 12 11; do
         candidate="$prefix/bin/python3.$minor"
         if [ -x "$candidate" ] && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
           echo "$candidate"
           return 0
         fi
       done
+      # Some installs only symlink "python3" into the prefix.
+      candidate="$prefix/bin/python3"
+      if [ -x "$candidate" ] && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+        echo "$candidate"
+        return 0
+      fi
     fi
   fi
   return 1

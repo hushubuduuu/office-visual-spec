@@ -156,3 +156,18 @@ jobs:
           assert doc.page_count == 6, doc.page_count
           print("macOS a4 export OK:", doc.page_count, "pages")
           PY
+
+      - name: "Fallback path (OVS_NO_VIRTUAL_TIME=1: no-budget retry chain)"
+        # Deterministically exercises the no-budget fallback: profile sync
+        # title probe, ANIM_STATIC_CSS pdf injection, and the a4 export chain
+        # end-to-end, so the fallback path is covered by CI instead of only
+        # firing when the budget flag happens to hang.
+        run: |
+          OVS_NO_VIRTUAL_TIME=1 .venv/bin/python scripts/render-html.py a4 templates/a4-summary.html out-fb/
+          OVS_NO_VIRTUAL_TIME=1 .venv/bin/python scripts/render-html.py ppt-web templates/ppt-web.html --check-only
+          .venv/bin/python - <<'PY'
+          import pymupdf
+          doc = pymupdf.open("out-fb/pdf/a4.pdf")
+          assert doc.page_count == 6, doc.page_count
+          print("macOS fallback a4 OK:", doc.page_count, "pages")
+          PY
