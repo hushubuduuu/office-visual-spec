@@ -22,9 +22,10 @@ call :maybe_pause %*
 exit /b %OVS_RC%
 
 :maybe_pause
-rem Match /nopause anywhere in the arguments (install.bat style):
-rem "doctor.bat foo /nopause" must not pause either.
-echo %* | findstr /i "/nopause" >nul
+rem Match /nopause anywhere in the arguments. /c: forces findstr to treat
+rem the search string as a literal (a bare "/nopause" would be parsed as
+rem an option and never match).
+echo %* | findstr /i /c:"/nopause" >nul
 if not errorlevel 1 exit /b 0
 if defined OVS_NO_PAUSE exit /b 0
 if defined CI exit /b 0

@@ -72,6 +72,8 @@ out/
 
 `<w>,<h>` 是逻辑 CSS 尺寸，`<scale>` 只控制输出像素倍率。
 
+平台差异（自动处理，agent 无需干预）：macOS 默认不传 `--user-data-dir`（改用 `--incognito` 内存隔离，避免部分 macOS 构建挂起），仅探针空输出时自动用临时 profile 重试一次；`--virtual-time-budget` 在部分环境会挂起（chromium issue 40219957，间歇性/环境相关），脚本检测到后自动移除并重试，截图回退把动画压缩到瞬时完成、PDF 回退（print-to-pdf 为 t=0 同步快照）把动画静态化；`OVS_NO_VIRTUAL_TIME=1` 可强制禁用 budget 路径。详见 README「macOS 注意事项」。
+
 - 默认禁止渲染时联网；确需联网时设置环境变量 `OVS_ALLOW_NETWORK=1`。
 - 默认启用浏览器沙箱；脚本会自动探测沙箱可用性，仅在带沙箱无法启动时降级并在终端显示 WARN。`OVS_NO_SANDBOX=1` 可强制关闭沙箱。
 - 可用 `OVS_BROWSER` 指定浏览器路径或命令；可用 `OVS_DEBUG=1` 显示完整错误信息。

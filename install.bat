@@ -67,7 +67,9 @@ exit /b %OVS_RC%
 
 :maybe_pause
 if /i "%~1"=="/nopause" exit /b 0
-echo(%*| findstr /i "/nopause" >nul 2>nul
+rem /c: forces a literal search; a bare "/nopause" would be parsed as a
+rem findstr option and never match.
+echo(%*| findstr /i /c:"/nopause" >nul 2>nul
 if not errorlevel 1 exit /b 0
 if defined OVS_NO_PAUSE exit /b 0
 if defined CI exit /b 0
