@@ -167,7 +167,7 @@ jobs:
       - name: "Full export a4 (loose assertion: font metrics differ on macOS)"
         run: |
           .venv/bin/python scripts/render-html.py a4 templates/a4-summary.html out-mac/
-          python - <<'PY'
+          .venv/bin/python - <<'PY'
           import pymupdf
           doc = pymupdf.open("out-mac/pdf/a4.pdf")
           assert doc.page_count == 6, doc.page_count
