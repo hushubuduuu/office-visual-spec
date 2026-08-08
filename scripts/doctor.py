@@ -21,14 +21,26 @@ def check(name, ok, detail, hint="", warn=False):
 
 def main():
     py_ok = sys.version_info >= (3, 10)
-    check("Python 3.10+", py_ok, sys.version.split()[0], "请安装 Python 3.10 或更高版本")
+    py_hint = "请安装 Python 3.10 或更高版本"
+    if sys.platform == "darwin":
+        py_hint += "（macOS: brew install python@3.12；Apple Silicon 先执行 eval \"$(/opt/homebrew/bin/brew shellenv)\" 再重跑）"
+    check("Python 3.10+", py_ok, sys.version.split()[0], py_hint)
 
-    for mod in ["PIL", "fitz", "pptx"]:
+    for mod in ["PIL", "pptx"]:
         try:
             importlib.import_module(mod)
             check(mod, True, "已安装", "")
         except Exception:
             check(mod, False, "未安装", "请运行 install.bat 或 install.sh 安装依赖")
+    try:
+        importlib.import_module("pymupdf")  # PyMuPDF >= 1.24 提供顶层 pymupdf 包
+        check("PyMuPDF", True, "已安装", "")
+    except Exception:
+        try:
+            importlib.import_module("fitz")  # 旧版 PyMuPDF 兼容层
+            check("PyMuPDF", True, "已安装（fitz 兼容层）", "")
+        except Exception:
+            check("PyMuPDF", False, "未安装", "请运行 install.bat 或 install.sh 安装依赖")
 
     node = shutil.which("node")
     if node:
@@ -89,7 +101,7 @@ def main():
     if warned:
         print("共 %d 项警告（不影响渲染导出，可忽略）。" % warned)
     if failed:
-        print("共 %d 项未通过。请先处理上面的提示，再重新运行 doctor。" % failed)
+        print("共 %d 项未通过（参考项，不阻塞开工；渲染/导出失败时按提示补齐依赖后回查 doctor）。" % failed)
         raise SystemExit(1)
     print("全部通过，可以开始使用。")
 

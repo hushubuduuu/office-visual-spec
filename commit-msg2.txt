@@ -1,0 +1,15 @@
+fix: OVS_NO_SANDBOX actually disables sandbox; retry probe with fresh profile
+
+- run_headless: the OVS_NO_SANDBOX=1 path skipped the sandbox probe but
+  forgot to pass --no-sandbox, so the documented "force no sandbox"
+  contract did nothing and the browser still crashed on restricted
+  hosts (e.g. ubuntu-24.04 runners blocking unprivileged user
+  namespaces).
+- _sandbox_supported: the --no-sandbox retry reused the same
+  user-data-dir as the crashed first attempt; the poisoned profile
+  (singleton locks, partial files) made the retry crash too, so the
+  probe reported failure and doctor failed on the browser-start check.
+  Each probe attempt now gets a fresh profile directory.
+- ci.yml: set OVS_NO_SANDBOX=1 on the ubuntu smoke job (the documented
+  CI/container path), making the doctor browser check deterministic on
+  runners that restrict unprivileged user namespaces.

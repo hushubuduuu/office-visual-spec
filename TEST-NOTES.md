@@ -11,7 +11,7 @@
 install.bat
 bash install.sh
 
-# 环境自检（安装后必须通过）
+# 环境自检（参考项，不阻塞开工；渲染失败时回查）
 python scripts/doctor.py
 
 # 仅溢出检查（唯一入口，禁止手写探针）
@@ -40,7 +40,7 @@ python scripts/render-html.py html-page templates/html-page.html out/
 - PDF：A4 6 页、静态 PPT 3 页、交互 PPT 5 页、小红书 3 页、信息图 1 页；手机长图为单页长 PDF。
 - 长 PNG 会把 `vh` 变量覆盖为固定 px，不能出现拆页；手机长图 PDF 由长图直出，不拆页。
 - 间距、页边距、对齐一致；框框模块宽高可波动，但信息密度平衡。
-- doctor 失败项（❌）全部处理完才算通过；警告项（⚠️，Node）不影响渲染导出；任一渲染步骤 FAIL 时脚本退出码必须为 1。
+- doctor 失败项（❌）为参考项：不阻塞开工，渲染/导出失败时按提示补齐依赖后回查；警告项（⚠️，Node）不影响渲染导出；任一渲染步骤 FAIL 时脚本退出码必须为 1。
 - 交互 PPT 溢出检查必须走内置 `check_overflow(web=True)`；手写探针会被动画状态干扰，不是有效验证方式。
 - 自检时必须写出实际运行命令，不能只写“已验证”。
 - AI/CI 运行 bat 时加 `/nopause` 或设置 `OVS_NO_PAUSE=1`，不应挂起。

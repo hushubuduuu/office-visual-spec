@@ -37,7 +37,7 @@ jobs:
 
       - name: Validate all templates
         run: |
-          for t in a4-summary ppt-16-9 ppt-web html-page xhs-cards mobile-long infographic long-essay; do
+          for t in a4-summary ppt-16-9 ppt-web html-page xhs-cards mobile-long infographic; do
             node scripts/validate-html.mjs "templates/$t.html"
           done
 
@@ -59,8 +59,8 @@ jobs:
           img = Image.open("out/png/a4-full.png")
           expect = (794 * 2, 6 * 1123 * 2)
           assert img.size == expect, f"a4-full.png size {img.size} != {expect}"
-          import fitz
-          doc = fitz.open("out/pdf/a4.pdf")
+          import pymupdf
+          doc = pymupdf.open("out/pdf/a4.pdf")
           assert doc.page_count == 6, f"a4.pdf pages {doc.page_count} != 6"
           print("a4 export OK:", img.size, doc.page_count, "pages")
           PY
@@ -96,3 +96,57 @@ jobs:
 
       - name: Overflow check a4
         run: python scripts/render-html.py a4 templates/a4-summary.html --check-only
+
+      - name: Full export a4 (assert PNG size and PDF pages)
+        run: |
+          python scripts/render-html.py a4 templates/a4-summary.html out/
+          python - <<'PY'
+          from PIL import Image
+          img = Image.open("out/png/a4-full.png")
+          expect = (794 * 2, 6 * 1123 * 2)
+          assert img.size == expect, f"a4-full.png size {img.size} != {expect}"
+          import pymupdf
+          doc = pymupdf.open("out/pdf/a4.pdf")
+          assert doc.page_count == 6, f"a4.pdf pages {doc.page_count} != 6"
+          print("windows a4 export OK:", img.size, doc.page_count, "pages")
+          PY
+
+  macos-smoke:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: install.sh end-to-end (python probe + venv + pip + doctor)
+        # Covers the real installation path on macOS. The runner preinstalls
+        # Google Chrome at /Applications/Google Chrome.app/... which
+        # BROWSER_CANDIDATES finds; do NOT set OVS_NO_SANDBOX here (the
+        # macOS sandbox works normally).
+        run: bash install.sh
+
+      - name: Overflow check all types
+        run: |
+          .venv/bin/python scripts/render-html.py a4 templates/a4-summary.html --check-only
+          .venv/bin/python scripts/render-html.py html-ppt templates/ppt-16-9.html --check-only
+          .venv/bin/python scripts/render-html.py ppt-web templates/ppt-web.html --check-only
+          .venv/bin/python scripts/render-html.py html-page templates/html-page.html --check-only
+          .venv/bin/python scripts/render-html.py xhs templates/xhs-cards.html --check-only
+          .venv/bin/python scripts/render-html.py mobile-long templates/mobile-long.html --check-only
+          .venv/bin/python scripts/render-html.py infographic templates/infographic.html --check-only
+
+      - name: Full export a4 (loose assertion: font metrics differ on macOS)
+        run: |
+          .venv/bin/python scripts/render-html.py a4 templates/a4-summary.html out-mac/
+          python - <<'PY'
+          import pymupdf
+          doc = pymupdf.open("out-mac/pdf/a4.pdf")
+          assert doc.page_count == 6, doc.page_count
+          print("macOS a4 export OK:", doc.page_count, "pages")
+          PY

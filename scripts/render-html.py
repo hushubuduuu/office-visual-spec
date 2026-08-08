@@ -12,7 +12,7 @@ Usage:
   python render-html.py <type> <input.html> <outdir> [--scale 2] [--width 1080] [--check-only]
   python render-html.py <type> <input.html> --check-only
 
-Types: a4 | html-ppt | ppt-web | html-page | xhs | mobile-long | infographic
+Types: a4 | html-ppt (alias: ppt-16-9) | ppt-web | html-page | xhs | mobile-long | infographic
 """
 import argparse
 import re
@@ -208,7 +208,8 @@ def to_pdf(html_path, out_pdf, budget=15000, extra_css=""):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("type", choices=list(TYPES))
+    # "ppt-16-9"（模板文件名）作为 "html-ppt" 的别名接受，避免把模板名误当类型名。
+    ap.add_argument("type", choices=list(TYPES) + ["ppt-16-9"])
     ap.add_argument("input")
     ap.add_argument("outdir", nargs="?")
     ap.add_argument("--scale", type=int, default=None)
@@ -218,6 +219,9 @@ def main():
 
     if not args.check_only and not args.outdir:
         raise SystemExit("缺少输出目录参数。完整命令示例：python scripts/render-html.py <type> <input.html> <outdir>")
+
+    if args.type == "ppt-16-9":
+        args.type = "html-ppt"
 
     cfg = TYPES[args.type]
     scale = args.scale if args.scale is not None else cfg.get("default_scale", 2)

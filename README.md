@@ -33,16 +33,16 @@
 <img src="examples/preview-v2-xhs-card.png" width="260" alt="小红书卡片">
 <img src="examples/preview-v2-infographic.png" width="260" alt="信息图">
 
-先看样例，再决定要生成哪一种。
+先看样例，再决定要生成哪一种。`examples/` 下另有 a4-summary-example.html、xhs-cards-irregular.html、xhs-course-5p.html、a4-summary-sample.pdf、mobile-long-sample.png 等参考样本。
 
 ## 全新电脑先装两样东西
 
 安装脚本只负责 Python 依赖，以下两项是系统级前置，全新电脑默认没有：
 
-- **Python 3.10+**：Windows 运行 `winget install Python.Python.3.12`（或从 https://www.python.org/downloads/ 下载）；macOS 运行 `brew install python@3.12`（没有 Homebrew 先装：https://brew.sh）。
-- **浏览器**：Windows 自带 Edge，无需安装；macOS 只有 Safari，Safari 不支持本工具的无头渲染，必须装 Chrome/Edge/Chromium（`brew install --cask google-chrome`）。
+- **Python 3.10+**：Windows 运行 `winget install Python.Python.3.12`（或从 https://www.python.org/downloads/ 下载）；macOS 运行 `brew install python@3.12`（没有 Homebrew 先装：https://brew.sh）；Linux 用包管理器（Debian/Ubuntu：`sudo apt install python3 python3-venv`）。
+- **浏览器**：Windows 自带 Edge，无需安装；macOS 只有 Safari，Safari 不支持本工具的无头渲染，必须装 Chrome/Edge/Chromium（`brew install --cask google-chrome`）；Linux 用包管理器（Debian/Ubuntu：`sudo apt install chromium-browser`，Fedora：`sudo dnf install chromium`）。
 
-安装过程可能弹出系统授权（UAC / 密码 / 钥匙串），确认一次即可。装完再走下面的安装脚本。
+安装过程可能弹出系统授权（UAC / 密码 / 钥匙串），确认一次即可；macOS 首次安装 Homebrew / cask 需要输一次系统密码，请用户在场确认。装完再走下面的安装脚本。
 
 ## 手动安装依赖
 
@@ -79,7 +79,7 @@ requirements.txt                  # Python 依赖
 
 ## 使用
 
-以下命令中的 `python` 均指 `.venv` 内的解释器（Windows：`.venv\Scripts\python.exe`，macOS/Linux：`.venv/bin/python`）；没有 `.venv` 时先运行 `install.bat` / `install.sh`。
+以下命令中的 `python` 均指 `.venv` 内的解释器（Windows：`.venv\Scripts\python.exe`，macOS/Linux：`.venv/bin/python`）；没有 `.venv` 时先运行 `install.bat` / `install.sh`。Windows 命令把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`、`/` 换成 `\`。
 
 ```bash
 # 环境自检

@@ -38,6 +38,7 @@ if not exist ".venv\Scripts\python.exe" (
 
 echo Installing dependencies...
 ".venv\Scripts\python.exe" -m pip install --upgrade pip
+if errorlevel 1 echo 警告：pip 升级失败，继续尝试安装依赖
 if defined OVS_PIP_INDEX (
   ".venv\Scripts\python.exe" -m pip install -r requirements.txt --index-url "%OVS_PIP_INDEX%"
 ) else (
@@ -56,11 +57,18 @@ if errorlevel 1 (
 echo Setup complete. Running environment doctor...
 ".venv\Scripts\python.exe" scripts\doctor.py
 set "OVS_RC=%errorlevel%"
+if not "%OVS_RC%"=="0" (
+  echo.
+  echo doctor 有未通过项（参考项，不阻塞开工；渲染/导出失败时按提示补齐依赖后回查 doctor）。
+  echo 未找到浏览器时：可设置 OVS_BROWSER 指向 Chrome/Edge 完整路径，例如 C:\Program Files ^(x86^)\Microsoft\Edge\Application\msedge.exe。
+)
 call :maybe_pause %*
 exit /b %OVS_RC%
 
 :maybe_pause
 if /i "%~1"=="/nopause" exit /b 0
+echo(%*| findstr /i "/nopause" >nul 2>nul
+if not errorlevel 1 exit /b 0
 if defined OVS_NO_PAUSE exit /b 0
 if defined CI exit /b 0
 pause

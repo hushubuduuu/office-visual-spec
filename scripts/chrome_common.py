@@ -51,7 +51,13 @@ def detect_browser():
         found = shutil.which(override)
         if found:
             return Path(found)
-        raise SystemExit("OVS_BROWSER 指向的浏览器不存在：" + override)
+        raise SystemExit(
+            "OVS_BROWSER 未找到：" + override
+            + "。命令名未在 PATH 中时，请改用浏览器完整路径，例如 "
+            + "Windows: C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe；"
+            + "macOS: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome；"
+            + "Linux: /usr/bin/google-chrome"
+        )
     for candidate in BROWSER_CANDIDATES:
         if candidate.exists():
             return candidate
@@ -77,6 +83,11 @@ def find_browser():
 
 def flags(*extra):
     base = ["--headless=new", "--disable-gpu", "--disable-dev-shm-usage"]
+    if sys.platform == "darwin":
+        # Fresh headless profiles on macOS can pop a "Chrome Safe Storage"
+        # keychain prompt (a system dialog an agent cannot click), which
+        # stalls rendering until timeout. Mock the keychain instead.
+        base.append("--use-mock-keychain")
     if os.environ.get("OVS_NO_SANDBOX", "").lower() in ("1", "true", "yes"):
         base.append("--no-sandbox")
     if os.environ.get("OVS_ALLOW_NETWORK", "").lower() not in ("1", "true", "yes"):

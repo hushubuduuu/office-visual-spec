@@ -1,0 +1,22 @@
+fix: cross-platform robustness (utf-8 output, exit codes, CI, misc)
+
+- cli.py: reconfigure stdout/stderr to UTF-8 before the venv relaunch.
+  On Windows, redirected output (agent capture, > file, CI) uses the
+  ANSI codepage (GBK/cp1252) and crashed on emoji or CJK, which made
+  every script fail when stdout was captured.
+- cli.py: os.execv on Windows does not preserve the child's exit code
+  (the original process exits 0 regardless), silently swallowing all
+  failure signals for agents/CI. Run the venv interpreter as a child
+  and mirror its exit code instead.
+- chrome_common.py: sandbox probe used TemporaryDirectory without
+  ignore_cleanup_errors; Chrome still writing its profile caused
+  'Directory not empty' (Errno 39) cleanup crashes in CI.
+- chrome_common.py: OVS_BROWSER given as a command name returned the
+  non-existent raw Path instead of shutil.which()'s real path, breaking
+  POSIX where subprocess does not PATH-resolve bare names.
+- render-html.py: check_overflow silently passed when the HTML had no
+  .sheet/.canvas container; now errors with an explicit message.
+- install.sh: now verifies Python >= 3.10 (matches install.bat).
+- doctor.bat: friendly message when neither python nor py is found.
+- validate-html.mjs: match style blocks with attributes (e.g.
+  <style type="text/css">), not just bare <style>.

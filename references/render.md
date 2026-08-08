@@ -50,6 +50,8 @@ out/
   pdf/mobile-long.pdf       # 手机长图：单页长 PDF，由长图直出
 ```
 
+例外：ppt-web 只产出 `png/page-XX.png`（横向 deck 逐页截图，无 `-full.png`、无 `pages/`）；infographic 只产出 `png/infographic-full.png` + `pdf/infographic.pdf`，无 `pages/`。
+
 ## Chrome Headless 标准参数
 
 ```text
@@ -114,6 +116,16 @@ Array.from(document.querySelectorAll('.sheet, .canvas')).forEach(s => {
 - 可复制文字 PDF 用 Headless 打印；截图 PDF 只是视觉稿。
 - 手机长图的单页长 PDF 由已渲染的长图直接生成，与 PNG 画面一致；不使用 A4 分页打印。
 - 长 PNG 会把 `vh` 视口拉长，标准管线会对已知 `vh` 变量注入固定 px 覆盖，避免内容被撑高拆页。
+
+## 辅助脚本（可选）
+
+标准管线之外另有三个独立脚本，参数见各自 `--help`，均用 `.venv` 内 python 运行：
+
+- `scripts/pptx_template.py <out.pptx>`：生成 PPTX 模板，供 python-pptx 二次加工。
+- `scripts/pdf_from_html.py <out.pdf> --input <input.html>`：Headless 打印为可复制文字的 PDF。
+- `scripts/long_essay_to_png.py <input.html> <out.png> [--width 1080]`：连续长文 → 长图 PNG。
+
+任何一步失败退出码非零；`OVS_DEBUG=1` 可看完整错误。
 
 ## 验证清单
 

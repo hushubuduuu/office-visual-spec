@@ -18,7 +18,7 @@
 | HTML 页面 | `references/html-page.md` | `templates/html-page.html` | 不强制 |
 | 交互式网页 PPT | `references/ppt-web.md` | `templates/ppt-web.html` | 1vw=12.8 / 1vh=7.2 |
 | 小红书卡片系列 | `references/xhs-cards.md` | `templates/xhs-cards.html` | 1vw=10.8 / 1vh=14.4 |
-| 手机长图 / 连续长文 | `references/mobile-long.md` | `templates/mobile-long.html` 或 `templates/long-essay.html` | 1vw=10.8 |
+| 手机长图 / 连续长文 | `references/mobile-long.md` | `templates/mobile-long.html` | 1vw=10.8 |
 | 信息图 | `references/infographic.md` | `templates/infographic.html` | 1vw=10.8 / 1vh=12.15 |
 
 ## 共享文件

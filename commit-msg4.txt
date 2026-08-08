@@ -1,0 +1,47 @@
+fix: cross-review round 1 — macOS/Linux install path, doctor wording, CI macOS job
+
+Three independent review agents (Windows fresh-machine / macOS fresh-machine /
+delivery-integrity) reviewed the package end-to-end. Fixes from their findings:
+
+Install & bootstrap
+- install.sh: probe python3.13/3.12 and Homebrew prefix as fallbacks so a
+  fresh macOS machine (system /usr/bin/python3 = 3.9, /opt/homebrew/bin not
+  on PATH) no longer loops on the same hint after brew install python@3.12;
+  hint now includes `eval "$(/opt/homebrew/bin/brew shellenv)"`.
+- install.sh: pip upgrade failure is now non-fatal (warning, falls through to
+  the mirror-retried dependency install); Linux browser hint added.
+- install.bat: pip upgrade failure warns instead of silently passing;
+  :maybe_pause now also detects /nopause anywhere in %*; doctor failure
+  prints the "reference item, does not block" wording before propagating rc.
+- install.sh / doctor.sh marked executable in git (100755).
+- .gitattributes: force LF for *.sh, CRLF for *.bat (bash rejects CRLF).
+
+Runtime
+- chrome_common.py: OVS_BROWSER miss now explains how to pass a full path
+  per-OS instead of the misleading "not found"; darwin headless flags add
+  --use-mock-keychain to prevent the keychain prompt stalling fresh profiles.
+- doctor.py: module probe uses pymupdf (PyMuPDF>=1.24) with fitz fallback,
+  killing the deprecation warning noise; Python-version hint gains macOS
+  brew/shellenv guidance; closing wording matches SKILL.md's reference
+  (non-blocking) positioning.
+- pdf_from_html.py: import pymupdf as fitz.
+- render-html.py: accept "ppt-16-9" as an alias for "html-ppt".
+- requirements.txt: PyMuPDF>=1.24.0 (top-level pymupdf import).
+
+Docs
+- SKILL.md/README: Linux browser install guidance; macOS first-run
+  password/authorization note; Windows example commands.
+- references/html-page.md: filled theme registry, components & styling,
+  common errors (were empty).
+- references/render.md: auxiliary scripts section; output-structure
+  exceptions for ppt-web / infographic.
+- references/README.md + templates: dropped duplicate long-essay.html
+  (byte-identical to mobile-long.html).
+- TEST-NOTES.md: doctor failure items are reference items (non-blocking).
+
+CI
+- New macos-smoke job runs the real install.sh path end-to-end (venv+pip+
+  doctor) plus overflow checks and a loose a4 export assertion (font metrics
+  differ on macOS).
+- windows-smoke now asserts full a4 export (PNG size + PDF pages).
+- long-essay removed from template validation loop; fitz->pymupdf in assert.

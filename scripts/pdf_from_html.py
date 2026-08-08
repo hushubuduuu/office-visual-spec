@@ -63,7 +63,7 @@ def main():
         )
         if r.returncode != 0:
             raise SystemExit("浏览器渲染失败：" + r.stderr.decode("utf-8", "ignore")[-300:])
-        import fitz  # deferred until after argument parsing and browser success
+        import pymupdf as fitz  # PyMuPDF >= 1.24；deferred until after argument parsing and browser success
         doc = fitz.open(str(out))
         try:
             text = "".join(page.get_text() for page in doc)

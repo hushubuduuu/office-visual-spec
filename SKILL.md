@@ -11,7 +11,7 @@ description: |
 
 ## 0. AI 执行摘要（每次必读）
 
-0. **环境自检（辅助参考，不阻塞开工）**：环境不确定时运行 `python scripts/doctor.py` 诊断（统一用 .venv 内 python：Win `.venv\Scripts\python.exe`，Mac/Linux `.venv/bin/python`；没有 .venv 先跑 install.bat / install.sh，doctor 会自动切换）。doctor 输出仅作环境参考：❌ 项按提示补齐关键依赖即可，不必等全部通过再开工；渲染/导出失败时回查 doctor 定位问题。AI 给 bat 加 `/nopause` 或设 `OVS_NO_PAUSE=1`。缺系统依赖时 agent 负责装：Win 用 `winget install Python.Python.3.12`，浏览器用自带 Edge 无需安装；Mac 用 `brew install python@3.12` + `brew install --cask google-chrome`（Safari 不支持 headless）。浏览器已装但检测失败时设 `OVS_BROWSER`。
+0. **环境自检（辅助参考，不阻塞开工）**：环境不确定时运行 `python scripts/doctor.py` 诊断（统一用 .venv 内 python：Win `.venv\Scripts\python.exe`，Mac/Linux `.venv/bin/python`；没有 .venv 先跑 install.bat / install.sh，doctor 会自动切换）。doctor 输出仅作环境参考：❌ 项按提示补齐关键依赖即可，不必等全部通过再开工；渲染/导出失败时回查 doctor 定位问题。AI 给 bat 加 `/nopause` 或设 `OVS_NO_PAUSE=1`。缺系统依赖时 agent 负责装：Win 用 `winget install Python.Python.3.12`，浏览器用自带 Edge 无需安装；Mac 用 `brew install python@3.12` + `brew install --cask google-chrome`（Safari 不支持 headless；Apple Silicon 需先 `eval "$(/opt/homebrew/bin/brew shellenv)"` 让 brew 进 PATH；首次装 brew/cask 会要求输一次系统密码/授权，需用户在场确认）；Linux 用包管理器装 `python3 python3-venv` 和浏览器（Debian/Ubuntu：`sudo apt install chromium-browser`，Fedora：`sudo dnf install chromium`）。浏览器已装但检测失败时设 `OVS_BROWSER`（命令名需在 PATH，否则用完整路径）。
 1. 最高优先级：先问，再写；信息不够不开始生成。
 2. 信息足够后进入排版阶段：画面比例（间距、页边距、对齐）是第一要素，先定骨架，避免内容挤在一起或贴边。
 3. 先读 `references/README.md` 二级索引，由它路由到类型文件和共享文件。
