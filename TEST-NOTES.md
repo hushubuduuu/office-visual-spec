@@ -32,7 +32,7 @@ python scripts/render-html.py html-page templates/html-page.html out/
 
 ## 验收基线
 
-- 所有模板和示例通过 `validate-html.mjs`，失败数 0。
+- 所有模板（及交付前示例）通过 `validate-html.mjs`，失败数 0。
 - 每个分页容器 `scrollHeight ≤ clientHeight`，溢出直接失败。
 - PNG 输出像素 = 逻辑尺寸 × scale；A4 长图 1588 × 13476，静态 PPT 2560 × 4320，小红书 2160 × 8640（scale 2）。
 - 手机长图默认 3x，宽 3240px；HTML 页面默认 860px 宽。

@@ -7,3 +7,4 @@ Thumbs.db
 *.log
 *.bak
 *.tmp
+out-test/

@@ -1,7 +1,7 @@
 # 手机长图 / 连续长文生成规范
 ## 输出与模板
 
-- 模板：`templates/mobile-long.html / templates/long-essay.html`
+- 模板：`templates/mobile-long.html`
 - 导出：`scripts/validate-html.mjs` 自检；PNG/PDF 统一用 `scripts/render-html.py` 标准管线（见 `references/render.md`）
 - vw/vh 基准：1vw = 10.8px；高度不固定，不用 vh
 
