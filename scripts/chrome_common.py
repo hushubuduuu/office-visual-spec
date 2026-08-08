@@ -211,9 +211,12 @@ def run_headless_budget_safe(browser, args_fn, budget_ms, timeout, extra_flags=(
     a nonzero exit code is a real rendering error and is returned as-is, so a
     genuine failure is never masked by a fallback rerun. prepare_fallback() may
     rebuild the input page (e.g. inject ANIM_COMPRESS_CSS / ANIM_STATIC_CSS)
-    before the no-budget retry.
+    before ANY no-budget run — including when the budget path was already
+    known broken (or disabled via OVS_NO_VIRTUAL_TIME) — so the fallback page
+    is always injected, not just on the call that first detects the hang.
     """
     global _budget_ok
+    fallback_prepared = False
     if _budget_ok is not False and budget_ms:
         try:
             r = run_headless(
@@ -229,4 +232,7 @@ def run_headless_budget_safe(browser, args_fn, budget_ms, timeout, extra_flags=(
         _budget_ok = False
         if prepare_fallback:
             prepare_fallback()
+            fallback_prepared = True
+    if not fallback_prepared and prepare_fallback:
+        prepare_fallback()
     return run_headless(browser, list(extra_flags) + args_fn(None), timeout=timeout)

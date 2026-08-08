@@ -169,5 +169,6 @@ jobs:
           import pymupdf
           doc = pymupdf.open("out-fb/pdf/a4.pdf")
           assert doc.page_count == 6, doc.page_count
-          print("macOS fallback a4 OK:", doc.page_count, "pages")
+          assert doc[0].get_text().strip(), "a4.pdf page 1 is blank under the no-budget path"
+          print("macOS fallback a4 OK:", doc.page_count, "pages, text present")
           PY

@@ -125,6 +125,26 @@ def profile(html_path, web=False, width=None):
         if result.returncode != 0:
             raise SystemExit("浏览器渲染失败，错误信息：" + result.stderr.decode("utf-8", "ignore")[-300:])
         dom = result.stdout.decode("utf-8", "ignore")
+        if "PROFILE|" not in dom and sys.platform == "darwin":
+            # No --user-data-dir on macOS normally (issue 40133981 hangs headless
+            # with a fresh profile dir on some builds), but without it Chrome binds
+            # the user's real default profile: if a Chrome instance is already
+            # running, the headless process loses the singleton lock and dumps
+            # empty. Retry once with a fresh profile dir as a fallback. Must run
+            # BEFORE the finally cleanup below (tmp/probe.html still exists).
+            udd2 = tempfile.mkdtemp(prefix="ovs-probe-udd-")
+            try:
+                args = ["--dump-dom", "--user-data-dir=" + udd2]
+                if width:
+                    args.append("--window-size=%d,1200" % width)
+                args.append(Path(tmp).resolve().as_uri())
+                r2 = run_headless(find_browser(), args, timeout=15)
+                if r2.returncode == 0 and "PROFILE|" in r2.stdout.decode("utf-8", "ignore"):
+                    dom = r2.stdout.decode("utf-8", "ignore")
+            except subprocess.TimeoutExpired:
+                pass
+            finally:
+                cleanup_dir(udd2)
     except subprocess.TimeoutExpired:
         raise SystemExit(
             "浏览器探针超时：页面 20 秒内未完成渲染，无法测量尺寸。"
@@ -134,25 +154,6 @@ def profile(html_path, web=False, width=None):
     finally:
         cleanup_dir(udd)
         cleanup_dir(tmpdir)
-    if "PROFILE|" not in dom and sys.platform == "darwin":
-        # No --user-data-dir on macOS normally (issue 40133981 hangs headless
-        # with a fresh profile dir on some builds), but without it Chrome binds
-        # the user's real default profile: if a Chrome instance is already
-        # running, the headless process loses the singleton lock and dumps
-        # empty. Retry once with a fresh profile dir as a fallback.
-        udd2 = tempfile.mkdtemp(prefix="ovs-probe-udd-")
-        try:
-            args = ["--dump-dom", "--user-data-dir=" + udd2]
-            if width:
-                args.append("--window-size=%d,1200" % width)
-            args.append(Path(tmp).resolve().as_uri())
-            r2 = run_headless(find_browser(), args, timeout=15)
-            if r2.returncode == 0 and "PROFILE|" in r2.stdout.decode("utf-8", "ignore"):
-                dom = r2.stdout.decode("utf-8", "ignore")
-        except subprocess.TimeoutExpired:
-            pass
-        finally:
-            cleanup_dir(udd2)
     if "PROFILE|" not in dom:
         raise SystemExit("无法读取页面尺寸，请检查 HTML 文件是否完整，或用 OVS_DEBUG=1 查看详细错误。")
     m = re.search(r"<title>(PROFILE\|[^<]*)</title>", dom)
