@@ -11,7 +11,7 @@ description: |
 
 ## 0. AI 执行摘要（每次必读）
 
-0. **环境自检（每次必做）**：首次使用或环境不确定时，先运行 `python scripts/doctor.py`。doctor 未通过前不要开始生成和渲染；缺依赖时运行 `install.bat`（Windows）或 `bash install.sh`（macOS/Linux）。AI 自动化给 bat 加 `/nopause` 或设置 `OVS_NO_PAUSE=1`；浏览器检测失败时设置 `OVS_BROWSER` 后重跑 doctor。
+0. **环境自检（每次必做）**：首次使用或环境不确定时，先运行 `python scripts/doctor.py`。脚本统一用 `.venv` 内的 python 运行（Windows：`.venv\Scripts\python.exe`；macOS/Linux：`.venv/bin/python`）；没有 `.venv` 时先运行 `install.bat`（Windows）或 `bash install.sh`（macOS/Linux）创建并安装依赖。doctor 被系统 python 调用时会自动切换到 `.venv`，但命令示例统一按 venv python 写。doctor 未通过前不要开始生成和渲染；缺依赖时运行 `install.bat` / `bash install.sh`。AI 自动化给 bat 加 `/nopause` 或设置 `OVS_NO_PAUSE=1`；浏览器检测失败时设置 `OVS_BROWSER` 后重跑 doctor。
 1. 最高优先级：先问，再写；信息不够不开始生成。
 2. 信息足够后进入排版阶段：画面比例（间距、页边距、对齐）是第一要素，先定骨架，避免内容挤在一起或贴边。
 3. 先读 `references/README.md` 二级索引，由它路由到类型文件和共享文件。
@@ -51,11 +51,11 @@ description: |
 
 ## 3. 工作流
 
-0. **环境自检**：首次使用或环境不确定时，先运行 `python scripts/doctor.py`，未通过前不开始生成和渲染。
+0. **环境自检**：首次使用或环境不确定时，先运行 `python scripts/doctor.py`（用 `.venv` 内的 python 运行，见第 0 条），未通过前不开始生成和渲染。
 1. **提问确认**：输出类型、内容处理、结构形态、风格、内容功能区、美化强度；用户只说“做 PPT”时先解释静态/动态两种 PPT。
 2. **读索引**：按 `references/README.md` 路由到类型文件；需要时读 `references/modules.md` 选模块。
 3. **生成可用 HTML**：单一 `<style>`、CSS 变量、真实文字、目标尺寸排版；固定画布按 vw/vh 基准排版，自然高度按 px/vw 排版。
-4. **自检 Review**：文字可选中、无溢出、无重叠、分页无空白页、同层级一致；重点检查间距、页边距、对齐。溢出检查必须运行 `python scripts/render-html.py <type> <html> --check-only` 并写出实际命令，禁止手写探针。
+4. **自检 Review**：文字可选中、无溢出、无重叠、分页无空白页、同层级一致；重点检查间距、页边距、对齐。溢出检查必须运行 `python scripts/render-html.py <type> <html> --check-only`（venv python，见第 0 条）并写出实际命令，禁止手写探针。
 5. **输出交付结果**：HTML 路径、尺寸、页数、可导出格式。
 6. **调整阶段**：先改 HTML → 生成预览并打开小工具 → 用户确认满意后再结束；每次只改需要改的部分。
 7. **导出**：按 `references/render.md` 的标准管线输出 PNG/PDF，不做临场发明。

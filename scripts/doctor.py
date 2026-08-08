@@ -13,8 +13,10 @@ from cli import run_main
 CHECKS = []
 
 
-def check(name, ok, detail, hint=""):
-    CHECKS.append((name, ok, detail, hint))
+def check(name, ok, detail, hint="", warn=False):
+    """Record one check. warn=True downgrades a failure to a warning:
+    it is printed with ⚠ and does not affect the exit code."""
+    CHECKS.append((name, ok, detail, hint, warn))
 
 
 def main():
@@ -34,11 +36,11 @@ def main():
             r = subprocess.run([node, "--version"], capture_output=True, timeout=10, text=True)
             version = (r.stdout or r.stderr).strip()
             ok = version.startswith("v") and len(version) > 1 and version[1:2].isdigit() and int(version[1:].split(".")[0]) >= 18
-            check("Node.js 18+", ok, version, "请安装 Node.js 18 或更高版本")
+            check("Node.js 18+", ok, version, "Node 仅用于 validate-html 结构自检，不影响渲染导出；可忽略，或安装 Node.js 18+", warn=True)
         except Exception as e:
-            check("Node.js 18+", False, str(e), "请安装 Node.js 18 或更高版本")
+            check("Node.js 18+", False, str(e), "Node 仅用于 validate-html 结构自检，不影响渲染导出；可忽略，或安装 Node.js 18+", warn=True)
     else:
-        check("Node.js 18+", False, "未找到 node", "请安装 Node.js 18 或更高版本")
+        check("Node.js 18+", False, "未找到 node", "Node 仅用于 validate-html 结构自检，不影响渲染导出；可忽略，或安装 Node.js 18+", warn=True)
 
     safari_hint = ""
     if sys.platform == "darwin" and Path("/Applications/Safari.app").exists():
@@ -69,14 +71,23 @@ def main():
     print("office-visual-spec 环境自检")
     print("-" * 40)
     failed = 0
-    for name, ok, detail, hint in CHECKS:
-        mark = "✅" if ok else "❌"
-        print(mark + " " + name + ": " + str(detail))
-        if not ok:
+    warned = 0
+    for name, ok, detail, hint, warn in CHECKS:
+        if ok:
+            print("✅ " + name + ": " + str(detail))
+        elif warn:
+            warned += 1
+            print("⚠️ " + name + ": " + str(detail))
+            if hint:
+                print("    说明：" + hint)
+        else:
             failed += 1
+            print("❌ " + name + ": " + str(detail))
             if hint:
                 print("    请处理：" + hint)
     print("-" * 40)
+    if warned:
+        print("共 %d 项警告（不影响渲染导出，可忽略）。" % warned)
     if failed:
         print("共 %d 项未通过。请先处理上面的提示，再重新运行 doctor。" % failed)
         raise SystemExit(1)

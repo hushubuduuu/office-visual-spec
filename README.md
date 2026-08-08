@@ -49,7 +49,7 @@ macOS / Linux：
 2. 运行 `bash doctor.sh`
 3. 看到“全部通过”就可以开始用
 
-`doctor` 会逐项检查 Python、依赖、Node、Chrome/Edge，并显示 ✅/❌ 和解决办法。AI 或 CI 自动运行时，给 bat 加 `/nopause`，或设置 `OVS_NO_PAUSE=1`。
+`doctor` 会逐项检查 Python、依赖、Node、Chrome/Edge，并显示 ✅/❌/⚠️ 和解决办法（Node 缺失只是警告，不影响渲染导出）。AI 或 CI 自动运行时，给 bat 加 `/nopause`，或设置 `OVS_NO_PAUSE=1`。
 
 ## 给 AI / agent 的入口
 
@@ -70,23 +70,25 @@ requirements.txt                  # Python 依赖
 
 ## 使用
 
+以下命令中的 `python` 均指 `.venv` 内的解释器（Windows：`.venv\Scripts\python.exe`，macOS/Linux：`.venv/bin/python`）；没有 `.venv` 时先运行 `install.bat` / `install.sh`。
+
 ```bash
 # 环境自检
-python scripts/doctor.py
+.venv/bin/python scripts/doctor.py
 
-# 自检 HTML
+# 自检 HTML（可选；没有 Node 时跳过，不影响渲染导出）
 node scripts/validate-html.mjs templates/ppt-16-9.html
 
 # 标准导出：类型 + 输入 + 输出目录
-python scripts/render-html.py html-ppt templates/ppt-16-9.html out/
-python scripts/render-html.py mobile-long templates/mobile-long.html out/
+.venv/bin/python scripts/render-html.py html-ppt templates/ppt-16-9.html out/
+.venv/bin/python scripts/render-html.py mobile-long templates/mobile-long.html out/
 ```
 
 ## 依赖
 
 - Python 3.10+
 - `Pillow`、`PyMuPDF`、`python-pptx`（见 `requirements.txt`）
-- Node.js 18+（仅自检脚本需要）
+- Node.js 18+（仅自检脚本需要，缺失不影响渲染导出）
 - Chrome / Edge / Chromium
 
 在中国大陆如果官方 PyPI 慢或失败，`install.bat` / `install.sh` 会自动用清华镜像重试，也可以先设置 `OVS_PIP_INDEX` 指定镜像。

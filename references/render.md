@@ -25,15 +25,20 @@ PNG 规则：`输出像素 = HTML 画布 CSS 像素 × scale`。不要先乘 2 �
 
 ## 标准命令
 
+脚本统一用 `.venv` 内的 python 运行（Windows：`.venv\Scripts\python.exe`；macOS/Linux：`.venv/bin/python`）。没有 `.venv` 时先运行 `install.bat` / `install.sh`；doctor 或 render 被系统 python 调用时会自动切换到 `.venv`，但命令示例统一按 venv python 写：
+
 ```text
-python scripts/render-html.py <type> <input.html> <outdir> [--scale 2] [--width 1080]
+.venv\Scripts\python.exe scripts\render-html.py <type> <input.html> <outdir> [--scale 2] [--width 1080]   # Windows
+.venv/bin/python scripts/render-html.py <type> <input.html> <outdir> [--scale 2] [--width 1080]          # macOS / Linux
 ```
+
+> 下文出现 `python scripts/render-html.py ...` 时，均指 `.venv` 内的解释器。
 
 - `<type>`：`a4 | html-ppt | ppt-web | html-page | xhs | mobile-long | infographic`
 - `--scale`：PNG 倍率；A4/PPT/卡片/信息图默认 2，手机长图默认 3
 - `--width`：仅 `html-page` / `mobile-long` 生效，覆盖默认逻辑宽度
 - 长图会自动读取内容高度，再按该高度截图，不会截断也不会留下大片空白
-- 仅做溢出检查：`python scripts/render-html.py <type> <input.html> --check-only`；交互 PPT 自动使用 `web=True`，禁止手写探针。
+- 仅做溢出检查：`python scripts/render-html.py <type> <input.html> --check-only`（venv python，见上文）；交互 PPT 自动使用 `web=True`，禁止手写探针。
 
 输出结构：
 
