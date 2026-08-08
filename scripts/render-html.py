@@ -21,7 +21,10 @@ import tempfile
 import time
 from pathlib import Path
 
-from PIL import Image
+# NOTE: no third-party imports at module level on purpose. The venv bootstrap
+# lives in cli.run_main(); if a system python without deps imports this module,
+# a top-level third-party import would crash before the bootstrap can re-exec
+# under .venv. PIL is only needed for the mobile-long PDF branch below.
 
 from chrome_common import find_browser, flags as chrome_flags, run_headless
 from cli import run_main
@@ -274,6 +277,7 @@ def main():
 
     pdf = out / "pdf" / ("%s.pdf" % args.type)
     if args.type == "mobile-long":
+        from PIL import Image  # deferred import: keeps the import-time chain third-party-free
         with Image.open(str(png)) as im:
             im.convert("RGB").save(str(pdf), "PDF", resolution=96.0)
         print("OK", "pdf long")
