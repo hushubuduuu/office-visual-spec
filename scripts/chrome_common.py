@@ -97,37 +97,39 @@ def _sandbox_supported(browser):
     global _sandbox_state
     if _sandbox_state is not None:
         return _sandbox_state
-    with tempfile.TemporaryDirectory(prefix="ovs-sandbox-probe-", ignore_cleanup_errors=True) as td:
-        args = [
-            "--user-data-dir=" + td,
-            "--virtual-time-budget=1500",
-            "--dump-dom",
-            "about:blank",
-        ]
-        try:
-            r = subprocess.run([str(browser)] + flags(*args), capture_output=True, timeout=15)
-            if r.returncode == 0:
-                _sandbox_state = True
-                return True
-        except subprocess.TimeoutExpired:
-            pass
-        retry = [str(browser), "--no-sandbox"] + flags(*args)
-        try:
-            r2 = subprocess.run(retry, capture_output=True, timeout=15)
-            if r2.returncode == 0:
-                _sandbox_state = False
+
+    def _probe(extra):
+        # Fresh profile per attempt: a crashed first run poisons its
+        # user-data-dir (singleton locks, partial files) and can crash a
+        # retry that reuses it.
+        with tempfile.TemporaryDirectory(prefix="ovs-sandbox-probe-", ignore_cleanup_errors=True) as td:
+            args = [
+                "--user-data-dir=" + td,
+                "--virtual-time-budget=1500",
+                "--dump-dom",
+                "about:blank",
+            ]
+            try:
+                r = subprocess.run([str(browser)] + extra + flags(*args), capture_output=True, timeout=15)
+                return r.returncode == 0
+            except subprocess.TimeoutExpired:
                 return False
-        except subprocess.TimeoutExpired:
-            pass
-        _sandbox_state = None
+
+    if _probe([]):
+        _sandbox_state = True
         return True
+    if _probe(["--no-sandbox"]):
+        _sandbox_state = False
+        return False
+    _sandbox_state = None
+    return True
 
 
 def run_headless(browser, args, timeout=None):
     global _sandbox_warned
     force_no_sandbox = os.environ.get("OVS_NO_SANDBOX", "").lower() in ("1", "true", "yes")
     if force_no_sandbox:
-        return subprocess.run([str(browser)] + flags(*args), capture_output=True, timeout=timeout)
+        return subprocess.run([str(browser), "--no-sandbox"] + flags(*args), capture_output=True, timeout=timeout)
     if not _sandbox_supported(browser):
         if not _sandbox_warned:
             print("WARN: 当前环境无法使用浏览器沙箱，已自动改用无沙箱模式；如不希望降级，请更换运行环境。", flush=True)

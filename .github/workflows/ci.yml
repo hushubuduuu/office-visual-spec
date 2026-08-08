@@ -8,6 +8,11 @@ on:
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    env:
+      # ubuntu-24.04 runners restrict unprivileged user namespaces, which
+      # crashes Chrome's sandbox; the documented CI/container path is to
+      # force --no-sandbox via OVS_NO_SANDBOX.
+      OVS_NO_SANDBOX: "1"
     steps:
       - uses: actions/checkout@v4
 
