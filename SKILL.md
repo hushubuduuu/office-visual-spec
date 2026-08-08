@@ -11,7 +11,7 @@ description: |
 
 ## 0. AI 执行摘要（每次必读）
 
-0. **环境自检（每次必做）**：先运行 `python scripts/doctor.py`（统一用 .venv 内 python：Win `.venv\Scripts\python.exe`，Mac/Linux `.venv/bin/python`；没有 .venv 先跑 install.bat / install.sh，doctor 会自动切换）。未通过前不开始生成；AI 给 bat 加 `/nopause` 或设 `OVS_NO_PAUSE=1`。缺系统依赖时 agent 负责装：Win 用 `winget install Python.Python.3.12`，浏览器用自带 Edge 无需安装；Mac 用 `brew install python@3.12` + `brew install --cask google-chrome`（Safari 不支持 headless）；装完重跑 doctor。浏览器已装但检测失败时设 `OVS_BROWSER` 后重跑 doctor。
+0. **环境自检（辅助参考，不阻塞开工）**：环境不确定时运行 `python scripts/doctor.py` 诊断（统一用 .venv 内 python：Win `.venv\Scripts\python.exe`，Mac/Linux `.venv/bin/python`；没有 .venv 先跑 install.bat / install.sh，doctor 会自动切换）。doctor 输出仅作环境参考：❌ 项按提示补齐关键依赖即可，不必等全部通过再开工；渲染/导出失败时回查 doctor 定位问题。AI 给 bat 加 `/nopause` 或设 `OVS_NO_PAUSE=1`。缺系统依赖时 agent 负责装：Win 用 `winget install Python.Python.3.12`，浏览器用自带 Edge 无需安装；Mac 用 `brew install python@3.12` + `brew install --cask google-chrome`（Safari 不支持 headless）。浏览器已装但检测失败时设 `OVS_BROWSER`。
 1. 最高优先级：先问，再写；信息不够不开始生成。
 2. 信息足够后进入排版阶段：画面比例（间距、页边距、对齐）是第一要素，先定骨架，避免内容挤在一起或贴边。
 3. 先读 `references/README.md` 二级索引，由它路由到类型文件和共享文件。
@@ -51,7 +51,7 @@ description: |
 
 ## 3. 工作流
 
-0. **环境自检**：首次使用或环境不确定时，先运行 `python scripts/doctor.py`（用 `.venv` 内的 python 运行，见第 0 条），未通过前不开始生成和渲染。
+0. **环境自检（参考）**：首次使用或环境不确定时，可先运行 `python scripts/doctor.py`（用 `.venv` 内的 python 运行，见第 0 条）诊断环境；未通过项不阻塞开工，渲染失败时回查 doctor 提示补齐依赖。
 1. **提问确认**：输出类型、内容处理、结构形态、风格、内容功能区、美化强度；用户只说“做 PPT”时先解释静态/动态两种 PPT。
 2. **读索引**：按 `references/README.md` 路由到类型文件；需要时读 `references/modules.md` 选模块。
 3. **生成可用 HTML**：单一 `<style>`、CSS 变量、真实文字、目标尺寸排版；固定画布按 vw/vh 基准排版，自然高度按 px/vw 排版。
