@@ -4,6 +4,9 @@ cd "$(dirname "$0")"
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "Python 3.10 or newer is required."
+  echo "  macOS: brew install python@3.12  (install Homebrew first if missing: https://brew.sh)"
+  echo "  Linux: use your package manager, e.g. sudo apt install python3 python3-venv"
+  echo "Then run this script again."
   exit 1
 fi
 

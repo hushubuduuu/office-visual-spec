@@ -5,6 +5,9 @@ cd /d "%~dp0"
 where python >nul 2>nul
 if errorlevel 1 (
   echo Python not found. Please install Python 3.10 or newer first.
+  echo   Windows: winget install Python.Python.3.12
+  echo   or download from https://www.python.org/downloads/
+  echo Then run this script again.
   call :maybe_pause %*
   exit /b 1
 )

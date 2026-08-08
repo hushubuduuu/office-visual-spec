@@ -35,6 +35,15 @@
 
 先看样例，再决定要生成哪一种。
 
+## 全新电脑先装两样东西
+
+安装脚本只负责 Python 依赖，以下两项是系统级前置，全新电脑默认没有：
+
+- **Python 3.10+**：Windows 运行 `winget install Python.Python.3.12`（或从 https://www.python.org/downloads/ 下载）；macOS 运行 `brew install python@3.12`（没有 Homebrew 先装：https://brew.sh）。
+- **浏览器**：Windows 自带 Edge，无需安装；macOS 只有 Safari，Safari 不支持本工具的无头渲染，必须装 Chrome/Edge/Chromium（`brew install --cask google-chrome`）。
+
+安装过程可能弹出系统授权（UAC / 密码 / 钥匙串），确认一次即可。装完再走下面的安装脚本。
+
 ## 手动安装依赖
 
 Windows：
