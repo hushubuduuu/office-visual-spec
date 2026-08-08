@@ -66,3 +66,37 @@ jobs:
           assert doc.page_count == 6, f"a4.pdf pages {doc.page_count} != 6"
           print("a4 export OK:", img.size, doc.page_count, "pages")
           PY
+
+      - name: Auxiliary scripts smoke
+        env:
+          OVS_BROWSER: ${{ env.CHROME_PATH }}
+        run: |
+          python -c "import sys; sys.path.insert(0, 'scripts'); import pdf_from_html, long_essay_to_png, pptx_template; print('aux imports OK')"
+          python scripts/pptx_template.py out/aux-example.pptx
+          python scripts/pdf_from_html.py out/aux-a4.pdf --input templates/a4-summary.html
+          python scripts/long_essay_to_png.py templates/mobile-long.html out/aux-long.png --width 1080
+
+  windows-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+
+      - name: Doctor
+        run: python scripts/doctor.py
+
+      - name: Validate A4 template
+        run: node scripts/validate-html.mjs templates/a4-summary.html
+
+      - name: Overflow check a4
+        run: python scripts/render-html.py a4 templates/a4-summary.html --check-only

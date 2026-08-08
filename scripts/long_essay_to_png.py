@@ -16,7 +16,6 @@ from cli import run_main
 
 
 def main():
-    from PIL import Image, ImageChops  # deferred: keeps the import-time chain third-party-free
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
@@ -49,6 +48,7 @@ def main():
         if r.returncode != 0:
             raise SystemExit("浏览器渲染失败：" + r.stderr.decode("utf-8", "ignore")[-300:])
 
+        from PIL import Image, ImageChops  # deferred until after argument parsing and browser success
         img = Image.open(shot).convert("RGB")
         bg = Image.new("RGB", img.size, (253, 253, 251))
         diff = ImageChops.difference(img, bg)
