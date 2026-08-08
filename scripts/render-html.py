@@ -17,6 +17,7 @@ Types: a4 | html-ppt | ppt-web | html-page | xhs | mobile-long | infographic
 import argparse
 import re
 import shutil
+import subprocess
 import tempfile
 import time
 from pathlib import Path
@@ -116,6 +117,13 @@ def profile(html_path, web=False, width=None):
         if result.returncode != 0:
             raise SystemExit("浏览器渲染失败，错误信息：" + result.stderr.decode("utf-8", "ignore")[-300:])
         dom = result.stdout.decode("utf-8", "ignore")
+    except subprocess.TimeoutExpired:
+        raise SystemExit(
+            "浏览器探针超时：页面 60 秒内未完成渲染，无法测量尺寸。"
+            "已知问题：playwright 自带的 chromium 主构建（路径含 ms-playwright 且不是 headless-shell）"
+            "与 headless 探针不兼容会挂起；请改用 Chrome / Edge / Chromium，"
+            "或把 OVS_BROWSER 指向 playwright 的 chrome-headless-shell。"
+        )
     finally:
         cleanup_dir(udd)
         cleanup_dir(tmpdir)

@@ -98,7 +98,7 @@ node scripts/validate-html.mjs templates/ppt-16-9.html
 - Python 3.10+
 - `Pillow`、`PyMuPDF`、`python-pptx`（见 `requirements.txt`）
 - Node.js 18+（仅自检脚本需要，缺失不影响渲染导出）
-- Chrome / Edge / Chromium
+- Chrome / Edge / Chromium（headless 渲染）。注意：不要用 playwright 自带的 chromium 主构建（路径含 `ms-playwright` 且非 headless-shell），它的 headless 探针会挂起；如果只有它，请把 `OVS_BROWSER` 指向 playwright 的 `chrome-headless-shell`。
 
 在中国大陆如果官方 PyPI 慢或失败，`install.bat` / `install.sh` 会自动用清华镜像重试，也可以先设置 `OVS_PIP_INDEX` 指定镜像。
 

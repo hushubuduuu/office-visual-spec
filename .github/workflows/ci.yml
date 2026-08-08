@@ -24,18 +24,15 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Chromium (playwright)
-        run: |
-          pip install playwright
-          playwright install --with-deps chromium
-          echo "CHROME_PATH=$(find "$HOME/.cache/ms-playwright" -name chrome -type f | head -1)" >> "$GITHUB_ENV"
-
       - name: Install Python deps
         run: pip install -r requirements.txt
 
       - name: Doctor
-        env:
-          OVS_BROWSER: ${{ env.CHROME_PATH }}
+        # The runner image ships Google Chrome at /usr/bin/google-chrome.
+        # Do NOT pin OVS_BROWSER to a playwright-installed chromium: its
+        # main build hangs the headless probe (--dump-dom + --virtual-time-
+        # budget) and crashes without --no-sandbox, while the preinstalled
+        # Chrome completes the same probe in <1s.
         run: python scripts/doctor.py
 
       - name: Validate all templates
@@ -45,8 +42,6 @@ jobs:
           done
 
       - name: Overflow check all types
-        env:
-          OVS_BROWSER: ${{ env.CHROME_PATH }}
         run: |
           python scripts/render-html.py a4 templates/a4-summary.html --check-only
           python scripts/render-html.py html-ppt templates/ppt-16-9.html --check-only
@@ -57,8 +52,6 @@ jobs:
           python scripts/render-html.py infographic templates/infographic.html --check-only
 
       - name: Full export a4 (assert PNG size and PDF pages)
-        env:
-          OVS_BROWSER: ${{ env.CHROME_PATH }}
         run: |
           python scripts/render-html.py a4 templates/a4-summary.html out/
           python - <<'PY'
@@ -73,8 +66,6 @@ jobs:
           PY
 
       - name: Auxiliary scripts smoke
-        env:
-          OVS_BROWSER: ${{ env.CHROME_PATH }}
         run: |
           python -c "import sys; sys.path.insert(0, 'scripts'); import pdf_from_html, long_essay_to_png, pptx_template; print('aux imports OK')"
           python scripts/pptx_template.py out/aux-example.pptx

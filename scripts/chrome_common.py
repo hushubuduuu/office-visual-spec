@@ -129,7 +129,8 @@ def run_headless(browser, args, timeout=None):
     global _sandbox_warned
     force_no_sandbox = os.environ.get("OVS_NO_SANDBOX", "").lower() in ("1", "true", "yes")
     if force_no_sandbox:
-        return subprocess.run([str(browser), "--no-sandbox"] + flags(*args), capture_output=True, timeout=timeout)
+        # flags() already appends --no-sandbox when OVS_NO_SANDBOX is set.
+        return subprocess.run([str(browser)] + flags(*args), capture_output=True, timeout=timeout)
     if not _sandbox_supported(browser):
         if not _sandbox_warned:
             print("WARN: 当前环境无法使用浏览器沙箱，已自动改用无沙箱模式；如不希望降级，请更换运行环境。", flush=True)
