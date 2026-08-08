@@ -127,6 +127,26 @@ jobs:
         with:
           node-version: "20"
 
+      - name: "Headless diagnostic (temporary: macOS user-data-dir hang)"
+        run: |
+          python - <<'PY'
+          import subprocess, tempfile
+          CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+          base = ["--headless=new", "--use-mock-keychain", "--disable-gpu", "--dump-dom", "about:blank"]
+          def t(label, extra):
+              try:
+                  r = subprocess.run([CHROME] + extra + base, capture_output=True, timeout=15)
+                  txt = (r.stdout[:60] or r.stderr[:80]).decode("utf-8", "ignore").replace("\n", " ")
+                  print(label, "rc=", r.returncode, txt)
+              except subprocess.TimeoutExpired:
+                  print(label, "TIMEOUT")
+          t("no-udd       ", [])
+          t("udd          ", ["--user-data-dir=" + tempfile.mkdtemp()])
+          t("incognito    ", ["--incognito"])
+          t("udd+incognito", ["--user-data-dir=" + tempfile.mkdtemp(), "--incognito"])
+          t("udd+nosandbox", ["--user-data-dir=" + tempfile.mkdtemp(), "--no-sandbox"])
+          PY
+
       - name: install.sh end-to-end (python probe + venv + pip + doctor)
         # Covers the real installation path on macOS. The runner preinstalls
         # Google Chrome at /Applications/Google Chrome.app/... which

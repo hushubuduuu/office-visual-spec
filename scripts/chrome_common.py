@@ -100,8 +100,12 @@ def flags(*extra):
     if sys.platform == "darwin":
         # Fresh headless profiles on macOS can pop a "Chrome Safe Storage"
         # keychain prompt (a system dialog an agent cannot click), which
-        # stalls rendering until timeout. Mock the keychain instead.
+        # stalls rendering until timeout. Mock the keychain instead, and use
+        # incognito (in-memory profile) as isolation: a --user-data-dir
+        # pointing at a fresh directory hangs headless on macOS
+        # (chromium issue 40133981).
         base.append("--use-mock-keychain")
+        base.append("--incognito")
     if os.environ.get("OVS_NO_SANDBOX", "").lower() in ("1", "true", "yes"):
         base.append("--no-sandbox")
     if os.environ.get("OVS_ALLOW_NETWORK", "").lower() not in ("1", "true", "yes"):
@@ -144,9 +148,13 @@ def _sandbox_supported(browser):
         # retry that reuses it.
         with tempfile.TemporaryDirectory(prefix="ovs-sandbox-probe-", ignore_cleanup_errors=True) as td:
             def args_fn(budget):
-                a = list(extra) + ["--user-data-dir=" + td, "--dump-dom", "about:blank"]
+                a = list(extra) + ["--dump-dom", "about:blank"]
                 if budget:
                     a.insert(1, budget)
+                # --user-data-dir hangs headless on macOS (issue 40133981);
+                # incognito (from flags()) provides isolation there.
+                if sys.platform != "darwin":
+                    a.insert(1, "--user-data-dir=" + td)
                 return a
             try:
                 r = _run_probe_direct(browser, args_fn, 1500)

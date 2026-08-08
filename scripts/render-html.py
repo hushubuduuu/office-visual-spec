@@ -18,6 +18,7 @@ import argparse
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -109,7 +110,9 @@ def profile(html_path, web=False, width=None):
     udd = tempfile.mkdtemp(prefix="ovs-probe-")
 
     def args_fn(budget):
-        a = ["--user-data-dir=" + udd, "--dump-dom"]
+        a = ["--dump-dom"]
+        if sys.platform != "darwin":
+            a.insert(0, "--user-data-dir=" + udd)
         if width:
             a.append("--window-size=%d,1200" % width)
         if budget:
@@ -177,8 +180,10 @@ def shot(html_path, out_png, w, h, scale, extra_css="", extra_js="", budget=1200
     udd = tempfile.mkdtemp(prefix="ovs-shot-")
 
     def args_fn(budget_flag):
-        a = ["--user-data-dir=" + udd, "--window-size=%d,%d" % (w, h),
+        a = ["--window-size=%d,%d" % (w, h),
              "--force-device-scale-factor=%d" % scale]
+        if sys.platform != "darwin":
+            a.insert(0, "--user-data-dir=" + udd)
         if budget_flag:
             a.append(budget_flag)
         a += ["--screenshot=" + str(out_png), Path(tmp).resolve().as_uri()]
@@ -214,8 +219,10 @@ def to_pdf(html_path, out_pdf, budget=15000, extra_css=""):
     udd = tempfile.mkdtemp(prefix="ovs-pdf-")
 
     def args_fn(budget_flag):
-        a = ["--user-data-dir=" + udd, "--print-to-pdf=" + str(out_pdf),
+        a = ["--print-to-pdf=" + str(out_pdf),
              "--print-to-pdf-no-header", "--no-pdf-header-footer"]
+        if sys.platform != "darwin":
+            a.insert(0, "--user-data-dir=" + udd)
         if budget_flag:
             a.append(budget_flag)
         a.append(Path(target).resolve().as_uri())
